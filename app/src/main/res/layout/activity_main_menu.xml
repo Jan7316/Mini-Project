@@ -9,8 +9,40 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="mini.app.orbis.MainMenuActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/welcome_message"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/colorText"
+            android:textSize="@dimen/text_size_welcome"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/menu_title_icon_distance" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+            <ImageButton
+                style="@style/MainMenuImageButton"
+                android:src="@drawable/book"/>
+            <Space
+                android:layout_width="@dimen/menu_icon_distance"
+                android:layout_height="match_parent" />
+            <ImageButton
+                style="@style/MainMenuImageButton"
+                android:src="@drawable/picture"/>
+        </LinearLayout>
+
+    </LinearLayout>
 </RelativeLayout>

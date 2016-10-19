@@ -8,4 +8,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- ActivityMainMenu -->
+    <style name="MainMenuImageButton">
+        <item name="android:layout_width">@dimen/menu_icon_size</item>
+        <item name="android:layout_height">@dimen/menu_icon_size</item>
+        <item name="android:background">@color/colorBackground</item>
+        <item name="android:scaleType">fitXY</item>
+    </style>
+
 </resources>
