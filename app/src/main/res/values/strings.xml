@@ -3,4 +3,7 @@
 
     <!-- MainMenuActivity -->
     <string name="welcome_message">Welcome to Orbis</string>
+
+    <!-- Gallery -->
+    <string name="gallery_title">Your 3D pictures</string>
 </resources>
