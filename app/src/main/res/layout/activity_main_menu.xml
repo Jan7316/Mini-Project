@@ -41,7 +41,8 @@
                 android:layout_height="match_parent" />
             <ImageButton
                 style="@style/MainMenuImageButton"
-                android:src="@drawable/picture"/>
+                android:src="@drawable/picture"
+                android:onClick="toGallery"/>
         </LinearLayout>
 
     </LinearLayout>

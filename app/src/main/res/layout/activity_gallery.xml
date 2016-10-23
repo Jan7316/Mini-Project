@@ -17,7 +17,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="@color/colorTitle"
             android:orientation="horizontal"
             android:padding="@dimen/gallery_title_bar_padding">
 
@@ -33,7 +33,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_alignParentRight="true">
+                android:layout_alignParentRight="true"
+                android:id="@+id/actions">
 
                 <ImageButton
                     android:id="@+id/share"
@@ -56,10 +57,16 @@
         </RelativeLayout>
 
         <ScrollView
-            android:id="@+id/gallery_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"></ScrollView>
+            android:layout_weight="1">
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:id="@+id/gallery_container"
+                android:columnCount="3"></GridLayout>
+        </ScrollView>
     </LinearLayout>
 
 </RelativeLayout>
