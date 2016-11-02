@@ -26,6 +26,10 @@ public class GalleryItemFragment extends Fragment {
     private static final String ARG_PATH = "path";
     private String path;
 
+    private View layout;
+
+    private int cellID = -1;
+
     private final String[] IMG_EXTENSIONS = {"jpg", "png", "gif", "bmp", "webp"};
 
     private OnFragmentInteractionListener mListener;
@@ -38,47 +42,39 @@ public class GalleryItemFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param path Path to the image
      * @return A new instance of fragment GalleryItemFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static GalleryItemFragment newInstance(String path) {
+    public static GalleryItemFragment newInstance() {
         GalleryItemFragment fragment = new GalleryItemFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PATH, path);
-        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            path = getArguments().getString(ARG_PATH);
-        }
-        Log.d("Arguments", (getArguments() == null) ? "not found" : "found");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_gallery_item, container, false);
+        layout = inflater.inflate(R.layout.fragment_gallery_item, container, false);
 
         if (path == null) {
-            return view;
+            return layout;
         }
 
         File imgFile = new File(path);
         if (imgFile.exists()) {
-            if (isImageExtension(imgFile.getAbsolutePath().substring(imgFile.getAbsolutePath().lastIndexOf(".") + 1, imgFile.getAbsolutePath().length()))) {
-                Bitmap myBitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(imgFile.getAbsolutePath()), 400, 300);
-                ImageView myImage = (ImageView) view.findViewById(R.id.image);
-                myImage.setImageBitmap(myBitmap);
-            }
+            //if (isImageExtension(imgFile.getAbsolutePath().substring(imgFile.getAbsolutePath().lastIndexOf(".") + 1, imgFile.getAbsolutePath().length()))) {
+            //    Bitmap myBitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(imgFile.getAbsolutePath()), 400, 300);
+            //    ImageView myImage = (ImageView) layout.findViewById(R.id.image);
+            //    myImage.setImageBitmap(myBitmap);
+            //}
         }
 
-        return view;
+        return null;
     }
 
     @Override
@@ -86,10 +82,23 @@ public class GalleryItemFragment extends Fragment {
         super.onResume();
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
+    /*// TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
+        }
+    }*/
+
+    public int getCurrentCellID() {
+        return cellID;
+    }
+
+    public void applyImage(int cellID, Bitmap bitmap) {
+        this.cellID = cellID;
+        Log.d("Orbis", "Image was applied for cell " + cellID);
+        if(!(getView() == null)) {
+            ImageView imageView = (ImageView) getView().findViewById(R.id.image);
+            imageView.setImageBitmap(bitmap);
         }
     }
 
@@ -98,6 +107,7 @@ public class GalleryItemFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
+            mListener.onFragmentInflated(this);
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -121,16 +131,13 @@ public class GalleryItemFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInflated(GalleryItemFragment fragment);
     }
 
-    private boolean isImageExtension(String ext) {
-        for (int i=0;i<IMG_EXTENSIONS.length;i++) {
-            if (ext.equals(IMG_EXTENSIONS[i]))
-                return true;
-        }
-        return false;
+    public int getHeight() {
+        if(getView() == null)
+            return 0;
+        return getView().getHeight();
     }
 
 }
