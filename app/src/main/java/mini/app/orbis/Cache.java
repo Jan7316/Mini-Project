@@ -1,7 +1,6 @@
 package mini.app.orbis;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.util.LruCache;
 
 import java.util.ArrayList;
@@ -30,8 +29,6 @@ public class Cache {
             memoryCache = new LruCache<String, Bitmap>(cacheSize) {
                 @Override
                 protected int sizeOf(String key, Bitmap bitmap) {
-                    // The cache size will be measured in kilobytes rather than
-                    // number of items.
                     return bitmap.getByteCount() / 1024;
                 }
             };
@@ -61,26 +58,16 @@ public class Cache {
 
     public static boolean isBitmapBeingLoaded(String key) {
         init();
-        Log.d("Orbis", "Bitmap key " + key + " is currently being loaded: " + workingOn.contains(key));
-        if(workingOn.size() > 0) {
-            Log.d("Orbis", workingOn.get(0));
-        } else {
-            Log.d("Orbis", "Arraylist length was 0");
-        }
         return workingOn.contains(key);
     }
 
     public static void markBitmapAsBeingLoaded(String key, boolean isBeingLoaded) {
         if(!isBeingLoaded) {
             workingOn.remove(key);
-            Log.d("Orbis", "Key " + key + " was removed");
             return;
         }
-        Log.d("Orbis", "Call for key " + key);
         if(!workingOn.contains(key)) {
-            Log.d("Orbis", "Added key " + key);
             workingOn.add(key);
-            Log.d("Orbis", "Recently added key exists: " + workingOn.contains(key));
         }
     }
 

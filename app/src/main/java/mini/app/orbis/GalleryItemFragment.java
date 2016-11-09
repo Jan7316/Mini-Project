@@ -2,18 +2,13 @@ package mini.app.orbis;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
-import java.io.File;
 
 /**
  * Activities that contain this fragment must implement the
@@ -22,20 +17,16 @@ import java.io.File;
  * Use the {@link GalleryItemFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GalleryItemFragment extends Fragment {
-    private static final String ARG_PATH = "path";
-    private String path;
+public class GalleryItemFragment extends Fragment implements View.OnClickListener, View.OnLongClickListener {
 
     private View layout;
 
     private int cellID = -1;
 
-    private final String[] IMG_EXTENSIONS = {"jpg", "png", "gif", "bmp", "webp"};
-
     private OnFragmentInteractionListener mListener;
 
     public GalleryItemFragment() {
-        // Required empty public constructor
+
     }
 
     /**
@@ -61,20 +52,12 @@ public class GalleryItemFragment extends Fragment {
         // Inflate the layout for this fragment
         layout = inflater.inflate(R.layout.fragment_gallery_item, container, false);
 
-        if (path == null) {
-            return layout;
-        }
+        View imageView = layout.findViewById(R.id.image);
 
-        File imgFile = new File(path);
-        if (imgFile.exists()) {
-            //if (isImageExtension(imgFile.getAbsolutePath().substring(imgFile.getAbsolutePath().lastIndexOf(".") + 1, imgFile.getAbsolutePath().length()))) {
-            //    Bitmap myBitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(imgFile.getAbsolutePath()), 400, 300);
-            //    ImageView myImage = (ImageView) layout.findViewById(R.id.image);
-            //    myImage.setImageBitmap(myBitmap);
-            //}
-        }
+        imageView.setOnClickListener(this);
+        imageView.setOnLongClickListener(this);
 
-        return null;
+        return layout;
     }
 
     @Override
@@ -82,23 +65,21 @@ public class GalleryItemFragment extends Fragment {
         super.onResume();
     }
 
-    /*// TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }*/
-
     public int getCurrentCellID() {
         return cellID;
     }
 
+    public void markAsLoading() {
+        if(getView() != null)
+            ((ImageView) getView().findViewById(R.id.image)).setImageResource(R.drawable.picture);
+    }
+
     public void applyImage(int cellID, Bitmap bitmap) {
         this.cellID = cellID;
-        Log.d("Orbis", "Image was applied for cell " + cellID);
         if(!(getView() == null)) {
             ImageView imageView = (ImageView) getView().findViewById(R.id.image);
             imageView.setImageBitmap(bitmap);
+            updateColorFilter();
         }
     }
 
@@ -120,24 +101,37 @@ public class GalleryItemFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         void onFragmentInflated(GalleryItemFragment fragment);
+        void onClick(boolean isLongClick, int itemID, GalleryItemFragment fragment);
+        boolean isItemSelected(int itemID);
     }
 
     public int getHeight() {
         if(getView() == null)
             return 0;
         return getView().getHeight();
+    }
+
+
+
+    @Override
+    public void onClick(View v) {
+        mListener.onClick(false, cellID, this);
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        mListener.onClick(true, cellID, this);
+        return true; // Cancel the onClick event
+    }
+
+    public void updateColorFilter() {
+        if(mListener.isItemSelected(cellID)) {
+            ((ImageView) getView().findViewById(R.id.image)).setColorFilter(Color.argb(100, 0, 0, 0));
+        } else {
+            ((ImageView) getView().findViewById(R.id.image)).setColorFilter(Color.argb(0, 0, 0, 0));
+        }
     }
 
 }

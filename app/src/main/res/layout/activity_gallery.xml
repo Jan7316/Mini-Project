@@ -43,7 +43,8 @@
                     android:layout_marginRight="@dimen/gallery_action_button_margin_right"
                     android:scaleType="fitXY"
                     android:src="@drawable/share"
-                    android:background="@null" />
+                    android:onClick="shareSelectedItems"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
 
                 <ImageButton
                     android:id="@+id/delete"
@@ -52,7 +53,8 @@
                     android:layout_marginRight="@dimen/gallery_action_button_margin_right"
                     android:scaleType="fitXY"
                     android:src="@drawable/trash"
-                    android:background="@null" />
+                    android:onClick="deleteSelectedItems"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
             </LinearLayout>
         </RelativeLayout>
 
