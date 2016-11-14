@@ -22,7 +22,11 @@
         </activity>
         <activity
             android:name=".GalleryActivity"
-            android:screenOrientation="landscape"></activity>
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".VRViewerActivity"
+            android:label="@string/title_activity_vrviewer"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
