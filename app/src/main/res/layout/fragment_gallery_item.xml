@@ -9,6 +9,6 @@
         android:layout_height="match_parent"
         android:scaleType="fitXY"
         android:id="@+id/image"
-        android:src="@drawable/picture"/> <!-- This is obviously temporary -->
+        android:src="@drawable/ic_loading_image"/> <!-- This is obviously temporary -->
 
 </FrameLayout>

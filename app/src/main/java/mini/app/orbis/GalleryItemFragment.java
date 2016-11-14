@@ -57,6 +57,8 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
         imageView.setOnClickListener(this);
         imageView.setOnLongClickListener(this);
 
+        mListener.onFragmentInflated(this);
+
         return layout;
     }
 
@@ -71,7 +73,7 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
 
     public void markAsLoading() {
         if(getView() != null)
-            ((ImageView) getView().findViewById(R.id.image)).setImageResource(R.drawable.picture);
+            ((ImageView) getView().findViewById(R.id.image)).setImageResource(R.drawable.ic_loading_image);
     }
 
     public void applyImage(int cellID, Bitmap bitmap) {
@@ -88,7 +90,6 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
-            mListener.onFragmentInflated(this);
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -113,8 +114,6 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
         return getView().getHeight();
     }
 
-
-
     @Override
     public void onClick(View v) {
         mListener.onClick(false, cellID, this);
@@ -132,6 +131,10 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
         } else {
             ((ImageView) getView().findViewById(R.id.image)).setColorFilter(Color.argb(0, 0, 0, 0));
         }
+    }
+
+    public void setCellID(int cellID) {
+        this.cellID = cellID;
     }
 
 }

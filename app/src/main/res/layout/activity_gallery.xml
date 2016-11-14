@@ -17,17 +17,33 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorTitle"
+            android:background="@drawable/gallery_actionbar_background"
             android:orientation="horizontal"
             android:padding="@dimen/gallery_title_bar_padding">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/gallery_title"
-                android:textColor="@color/colorText"
-                android:textSize="@dimen/title_bar_text_size"
-                android:textStyle="bold"/>
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/gallery_back_button_height"
+                    android:scaleType="fitStart"
+                    android:adjustViewBounds="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/orbis_logo_tiny_arrow"
+                    android:onClick="navigateBack"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/gallery_title"
+                    android:textColor="@color/colorText"
+                    android:textSize="@dimen/title_bar_text_size"
+                    android:textStyle="bold"
+                    android:layout_marginLeft="@dimen/gallery_back_button_margin"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -75,6 +91,32 @@
                     android:rowCount="10"></GridLayout>
             </LinearLayout>
         </ScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@drawable/gallery_choose_folder_background"
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:layout_gravity="center"
+            android:onClick="chooseFolder">
+
+            <ImageView
+                android:layout_width="@dimen/gallery_file_choose_button_size"
+                android:layout_height="@dimen/gallery_file_choose_button_size"
+                android:src="@drawable/ic_folder_open"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/title_bar_text_size"
+                android:textColor="@color/colorText"
+                android:text="Change folder"
+                android:padding="@dimen/gallery_title_bar_padding"/>
+        </LinearLayout>
+
     </LinearLayout>
 
 </RelativeLayout>

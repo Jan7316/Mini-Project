@@ -1,6 +1,7 @@
 package mini.app.orbis;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
@@ -12,7 +13,13 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.GridLayout;
+import android.widget.ScrollView;
 import android.widget.Space;
+
+import com.github.angads25.filepicker.controller.DialogSelectionListener;
+import com.github.angads25.filepicker.model.DialogConfigs;
+import com.github.angads25.filepicker.model.DialogProperties;
+import com.github.angads25.filepicker.view.FilePickerDialog;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,7 +30,11 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
 
     private boolean reInitFragments, alreadyInitializedSpaces;
 
+    private final String STATE_SCROLL_POSITION = "SCROLL_POSITION";
+
     public File[] images;
+
+    private int[] spaceViewIds;
 
     private boolean[] selectedItems;
     /**
@@ -56,16 +67,23 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
 
         findViewById(R.id.gallery_scroll).getViewTreeObserver().addOnScrollChangedListener(this);
 
-        if(savedInstanceState != null) {
-            return;
+        if(savedInstanceState == null) {
+            for(int i = 0; i < Math.min(viewportHeightInGridRows() * columnCount(), images.length); i++) {
+                GalleryItemFragment firstFragment = GalleryItemFragment.newInstance();
+                getSupportFragmentManager().beginTransaction().add(R.id.gallery_container, firstFragment).commit();
+            }
+
+            findViewById(R.id.actions).setVisibility(View.GONE);
+        } else {
+            findViewById(R.id.gallery_scroll).setScrollY(savedInstanceState.getInt(STATE_SCROLL_POSITION));
         }
 
-        for(int i = 0; i < Math.min(viewportHeightInGridRows() * columnCount(), images.length); i++) {
-            GalleryItemFragment firstFragment = GalleryItemFragment.newInstance();
-            getSupportFragmentManager().beginTransaction().add(R.id.gallery_container, firstFragment).commit();
-        }
+    }
 
-        findViewById(R.id.actions).setVisibility(View.GONE);
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putInt(STATE_SCROLL_POSITION, findViewById(R.id.gallery_scroll).getScrollY());
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -101,8 +119,13 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         int topGridRow = scrollDistanceToGridRow(currentTop);
 
         if(!alreadyInitializedSpaces) {
-            for(int i=0;i<images.length / columnCount() + (images.length % columnCount() > 0 ? 1 : 0);i++) {
+            int numberRequired = images.length / columnCount() + (images.length % columnCount() > 0 ? 1 : 0);
+            spaceViewIds = new int[numberRequired];
+            for(int i=0;i<numberRequired;i++) {
                 Space space = new Space(this);
+                int viewID = View.generateViewId();
+                spaceViewIds[i] = viewID;
+                space.setId(viewID);
                 GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
                 layoutParams.height = ((GalleryItemFragment) getSupportFragmentManager().getFragments().get(0)).getHeight();
                 layoutParams.width = 1;
@@ -114,24 +137,56 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
             alreadyInitializedSpaces = true;
         }
         for(int i=0;i<getSupportFragmentManager().getFragments().size();i++) {
-            applyScrollToFragment(i, getCellIdForFragment(i), topGridRow);
+            applyScrollToFragment(i, getCellIdForFragment(i), topGridRow, false);
         }
         reInitFragments = false;
     }
 
-    public void onFragmentInflated(GalleryItemFragment fragment) {
-        int topGridRow = 0;
-        applyScrollToFragment(getSupportFragmentManager().getFragments().indexOf(fragment), (topGridRow * columnCount()) + getSupportFragmentManager().getFragments().indexOf(fragment), 0); // TODO the 0 should be the current top row
+    public void updateSpaces() {
+        int numberRequired = images.length / columnCount() + (images.length % columnCount() > 0 ? 1 : 0);
+        if(numberRequired < spaceViewIds.length) {
+            int[] newSpaceList = new int[numberRequired];
+            for(int i=0;i<numberRequired; i++) {
+                newSpaceList[i] = spaceViewIds[i];
+            }
+            for(int i=numberRequired;i<spaceViewIds.length;i++) {
+                ((GridLayout) findViewById(R.id.gallery_container)).removeView(findViewById(spaceViewIds[i]));
+            }
+            spaceViewIds = newSpaceList;
+        } else if(numberRequired > spaceViewIds.length) {
+            // TODO
+        }
     }
 
-    private void applyScrollToFragment(int fragmentID, int cellID, int topRow) {
+    public void onFragmentInflated(GalleryItemFragment fragment) {
+        applyScrollToFragment(getSupportFragmentManager().getFragments().indexOf(fragment), getCellIdForFragment(getSupportFragmentManager().getFragments().indexOf(fragment)), 0, false); // TODO this does nothing, or at least not what it is supposed to do
+    }
+
+    private void applyScrollToFragment(int fragmentID, int cellID, int topRow, boolean forceImageUpdate) {
         GalleryItemFragment fragment = (GalleryItemFragment) getSupportFragmentManager().getFragments().get(fragmentID);
-        if(!(!(fragment.getCurrentCellID() == cellID) || reInitFragments)) {
+
+        if(fragment.getView() == null) {
+            return;
+        }
+
+        if(!(!(fragment.getCurrentCellID() == cellID) || reInitFragments || forceImageUpdate)) {
             // The fragment is already displaying the correct image
         } else {
             if(cellID >= images.length) {
+                fragment.getView().setVisibility(View.INVISIBLE);
+                fragment.setCellID(cellID);
                 return;
             }
+
+            // TODO
+            /*
+               When scrolling up while a currently visible fragment is waiting for its image to be loaded, the fragment stays in its cell rather than moving with the viewport. This is because,
+               when it was first moved, the fragment was not yet assigned its new cell ID, which it should receive from the AsyncTask once image loading is complete. However, inserting
+               fragment.setCellID(cellID)
+               at this point causes only the first row of fragments to load rather than all on the first screen (due to an unknown bug).
+             */
+
+            fragment.getView().setVisibility(View.VISIBLE);
             String filename = images[cellID].getName(); // TODO compatibility with duplicate file names (eg example.jpg/example.png)
             if(Cache.isBitmapCached(filename)) {
                 Log.d("Orbis", "Loading from cache " + fragmentID);
@@ -149,6 +204,15 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
             layoutParams.columnSpec = GridLayout.spec(cellID % columnCount());
 
             fragment.getView().setLayoutParams(layoutParams);
+        }
+    }
+
+    /**
+     * To be called when images were delete, a new image created or another folder opened
+     */
+    private void updateFragmentImages() {
+        for(int i=0;i<getSupportFragmentManager().getFragments().size();i++) {
+            applyScrollToFragment(i, getCellIdForFragment(i), scrollDistanceToGridRow(findViewById(R.id.gallery_scroll).getScrollY()), true);
         }
     }
 
@@ -174,6 +238,9 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
 
     private int scrollDistanceToGridRow(int px) {
         if(getSupportFragmentManager().getFragments() == null) {
+            return 0;
+        }
+        if(getSupportFragmentManager().getFragments().get(0) == null) { // Happens when return is pressed to quickly after starting the activity
             return 0;
         }
         if(((GalleryItemFragment) getSupportFragmentManager().getFragments().get(0)).getHeight() > 0)
@@ -270,6 +337,21 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         Log.d("Orbis", "Delete pictures");
+
+                        int[] indices = Util.allIndices(true, selectedItems);
+                        File[] newImages = new File[images.length - getNumberOfSelectedItems()];
+                        int j=0;
+                        for(int i=0;i<images.length;i++) {
+                            if(!Util.contains(indices, i)) {
+                                newImages[j] = images[i];
+                                j++;
+                            }
+                        }
+                        images = newImages;
+                        selectedItems = new boolean[newImages.length];
+                        updateFragmentImages();
+                        hideActionBarIcons();
+                        updateSpaces();
                     }})
                 .setNegativeButton(android.R.string.cancel, null).create();
         dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
@@ -302,6 +384,39 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
                 Log.d("Orbis", "Image " + itemID + " was clicked");
             }
         }
+    }
+
+    public void navigateBack(View view) {
+        finish();
+    }
+
+    public void chooseFolder(View view) {
+        DialogProperties properties = new DialogProperties();
+
+        properties.selection_mode= DialogConfigs.SINGLE_MODE;
+        properties.selection_type=DialogConfigs.DIR_SELECT;
+        properties.root=new File(DialogConfigs.DEFAULT_DIR); // TODO the file chooser does not allow to switch between primary and secondary storage
+        properties.error_dir=new File(DialogConfigs.DEFAULT_DIR);
+        properties.extensions=null;
+
+        FilePickerDialog dialog = new FilePickerDialog(GalleryActivity.this,properties);
+        dialog.setTitle("Choose Folder");
+
+        dialog.setDialogSelectionListener(new DialogSelectionListener() {
+            @Override
+            public void onSelectedFilePaths(String[] files) {
+                Log.d("Orbis", files[0]);
+            }
+        });
+
+        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        dialog.show();
+        dialog.getWindow().getDecorView().setSystemUiVisibility(
+                this.getWindow().getDecorView().getSystemUiVisibility());
+        dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+
+        /*Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        startActivityForResult(intent, FOLDER_CHOOSER_INTENT_ID);*/
     }
 
 }
