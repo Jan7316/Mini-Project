@@ -6,4 +6,5 @@
 
     <!-- Gallery -->
     <string name="gallery_title">Your 3D pictures</string>
+    <string name="title_activity_vrviewer">VRViewerActivity</string>
 </resources>
