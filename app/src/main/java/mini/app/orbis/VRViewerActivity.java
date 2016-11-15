@@ -34,12 +34,21 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
 
         path = getIntent().getStringExtra(GlobalVars.EXTRA_PATH);
 
-        new AsyncTaskLoadVRImage(this, path).execute();
+        /*new AsyncTaskLoadVRImage(this, path).execute();*/
 
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.id.loading_indicator); // TODO: Load pictures from storage into the viewer
+        /*Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.id.loading_indicator);
         createGPUImage(bitmap, R.id.leftView, false);
         bitmap = BitmapFactory.decodeResource(getResources(), R.id.loading_indicator);
-        createGPUImage(bitmap, R.id.rightView, false);
+        createGPUImage(bitmap, R.id.rightView, false);*/
+
+        Bitmap bitmap = BitmapFactory.decodeFile(path);
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        Bitmap left = Bitmap.createBitmap(bitmap, 0, 0, width / 2, height); // This may or may not work with .jps files
+        Bitmap right = Bitmap.createBitmap(bitmap, width / 2, 0, width / 2 - 1, height);
+        createGPUImage(left, R.id.leftView);
+        createGPUImage(right, R.id.rightView);
+        filter.setImageWidthToHeightRatio((float)left.getWidth()/left.getHeight());
 
         //filter.setImageWidthToHeightRatio((float)bitmap.getWidth()/bitmap.getHeight());
     }
@@ -75,10 +84,9 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
      * @param glSurfaceViewId The id of the target view
      * @return A pointer to the created GPUImage
      */
-    private GPUImage createGPUImage(Bitmap bitmap, int glSurfaceViewId, boolean glSurfaceViewInitialised) {
+    private GPUImage createGPUImage(Bitmap bitmap, int glSurfaceViewId) {
         GPUImage image = new GPUImage(this);
-        if(!glSurfaceViewInitialised)
-            image.setGLSurfaceView((GLSurfaceView) findViewById(glSurfaceViewId));
+        image.setGLSurfaceView((GLSurfaceView) findViewById(glSurfaceViewId));
         image.setImage(bitmap);
         image.setFilter(filter);
         return image;
@@ -86,8 +94,8 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
 
     @Override
     public void onImagesLoaded(Bitmap left, Bitmap right) {
-        createGPUImage(left, R.id.leftView, true);
-        createGPUImage(right, R.id.rightView, true);
+        createGPUImage(left, R.id.leftView);
+        createGPUImage(right, R.id.rightView);
         filter.setImageWidthToHeightRatio((float)right.getWidth()/right.getHeight());
     }
 
