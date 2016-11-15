@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,8 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
 
     private int cellID = -1;
 
+    private int fragmentID;
+
     private OnFragmentInteractionListener mListener;
 
     public GalleryItemFragment() {
@@ -36,8 +39,11 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
      * @return A new instance of fragment GalleryItemFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static GalleryItemFragment newInstance() {
+    public static GalleryItemFragment newInstance(int ID) {
         GalleryItemFragment fragment = new GalleryItemFragment();
+        Bundle args = new Bundle();
+        args.putInt(GlobalVars.FRAGMENT_ID, ID);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -49,6 +55,7 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d("Orbis", "OnFragmentInflated called");
         // Inflate the layout for this fragment
         layout = inflater.inflate(R.layout.fragment_gallery_item, container, false);
 
@@ -57,7 +64,9 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
         imageView.setOnClickListener(this);
         imageView.setOnLongClickListener(this);
 
-        mListener.onFragmentInflated(this);
+        fragmentID = getArguments().getInt(GlobalVars.FRAGMENT_ID);
+
+        mListener.onFragmentInflated(this, layout);
 
         return layout;
     }
@@ -82,6 +91,28 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
             ImageView imageView = (ImageView) getView().findViewById(R.id.image);
             imageView.setImageBitmap(bitmap);
             updateColorFilter();
+            imageView.invalidate();
+            Log.d("Orbis", "Image was set on cell " + cellID);
+        } else {
+            Log.d("Orbis", "Image could not be set as view was null");
+        }
+    }
+
+    /**
+     * The view argument only needs to be passed if the image is loaded directly from onCreateView() as getView() in such a case would be null
+     */
+    public void applyImage(int cellID, Bitmap bitmap, View view) {
+        this.cellID = cellID;
+        if(!(getView() == null)) {
+            ImageView imageView = (ImageView) getView().findViewById(R.id.image);
+            imageView.setImageBitmap(bitmap);
+            updateColorFilter();
+            imageView.invalidate();
+            Log.d("Orbis", "Image was set on cell " + cellID);
+        } else {
+            ImageView imageView = (ImageView) view.findViewById(R.id.image);
+            imageView.setImageBitmap(bitmap);
+            imageView.invalidate();
         }
     }
 
@@ -103,7 +134,7 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
     }
 
     public interface OnFragmentInteractionListener {
-        void onFragmentInflated(GalleryItemFragment fragment);
+        void onFragmentInflated(GalleryItemFragment fragment, View view);
         void onClick(boolean isLongClick, int itemID, GalleryItemFragment fragment);
         boolean isItemSelected(int itemID);
     }
@@ -135,6 +166,10 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
 
     public void setCellID(int cellID) {
         this.cellID = cellID;
+    }
+
+    public int getFragmentID() {
+        return fragmentID;
     }
 
 }

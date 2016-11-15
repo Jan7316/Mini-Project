@@ -12,14 +12,14 @@ import java.io.File;
  * Created by Jan on 23/10/2016.
  */
 
-public class AsyncTaskLoadImage extends AsyncTask {
+public class AsyncTaskLoadThumbnail extends AsyncTask {
 
     private GalleryActivity parent;
     private int cellID;
     private String id;
     private File file;
 
-    public AsyncTaskLoadImage(GalleryActivity parent, int cellID, String id, File file) { // The file must be an existing image file
+    public AsyncTaskLoadThumbnail(GalleryActivity parent, int cellID, String id, File file) { // The file must be an existing image file
         this.parent = parent;
         this.cellID = cellID;
         this.id = id;
@@ -30,7 +30,7 @@ public class AsyncTaskLoadImage extends AsyncTask {
     protected Object doInBackground(Object[] params) {
         if(!isCancelled()) {
             Log.d("Orbis", "Working on " + cellID);
-            Bitmap bitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(file.getAbsolutePath()), 400, 300);
+            Bitmap bitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(file.getAbsolutePath()), 400, 300); // TODO only take half of the image
             Cache.addBitmapToMemoryCache(id, bitmap);
             return bitmap;
         }

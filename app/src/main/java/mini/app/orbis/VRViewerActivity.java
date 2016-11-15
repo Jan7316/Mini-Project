@@ -1,6 +1,7 @@
 package mini.app.orbis;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,9 +16,10 @@ import jp.co.cyberagent.android.gpuimage.GPUImage;
  * Activity that displays two images side by side with distortion correction applied
  */
 
-public class VRViewerActivity extends AppCompatActivity {
+public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoadVRImage.ITaskParent {
     private VRViewerProperties properties;
     private DistortionCorrectionFilter filter;
+    private String path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +32,16 @@ public class VRViewerActivity extends AppCompatActivity {
         setViewDimensions(R.id.leftView);
         setViewDimensions(R.id.rightView);
 
-        Bitmap bitmap = null; // TODO: Load pictures from storage into the viewer
-        createGPUImage(bitmap, R.id.leftView);
-        bitmap = null;
-        createGPUImage(bitmap, R.id.rightView);
+        path = getIntent().getStringExtra(GlobalVars.EXTRA_PATH);
 
-        filter.setImageWidthToHeightRatio((float)bitmap.getWidth()/bitmap.getHeight());
+        new AsyncTaskLoadVRImage(this, path).execute();
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.id.loading_indicator); // TODO: Load pictures from storage into the viewer
+        createGPUImage(bitmap, R.id.leftView, false);
+        bitmap = BitmapFactory.decodeResource(getResources(), R.id.loading_indicator);
+        createGPUImage(bitmap, R.id.rightView, false);
+
+        //filter.setImageWidthToHeightRatio((float)bitmap.getWidth()/bitmap.getHeight());
     }
 
     @Override
@@ -69,12 +75,20 @@ public class VRViewerActivity extends AppCompatActivity {
      * @param glSurfaceViewId The id of the target view
      * @return A pointer to the created GPUImage
      */
-    private GPUImage createGPUImage(Bitmap bitmap, int glSurfaceViewId) {
+    private GPUImage createGPUImage(Bitmap bitmap, int glSurfaceViewId, boolean glSurfaceViewInitialised) {
         GPUImage image = new GPUImage(this);
-        image.setGLSurfaceView((GLSurfaceView) findViewById(glSurfaceViewId));
+        if(!glSurfaceViewInitialised)
+            image.setGLSurfaceView((GLSurfaceView) findViewById(glSurfaceViewId));
         image.setImage(bitmap);
         image.setFilter(filter);
         return image;
+    }
+
+    @Override
+    public void onImagesLoaded(Bitmap left, Bitmap right) {
+        createGPUImage(left, R.id.leftView, true);
+        createGPUImage(right, R.id.rightView, true);
+        filter.setImageWidthToHeightRatio((float)right.getWidth()/right.getHeight());
     }
 
     /*private Bitmap loadScaledImage(Resources res, int id) {
