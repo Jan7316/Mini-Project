@@ -48,22 +48,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         setContentView(R.layout.activity_gallery);
 
         String path = Environment.getExternalStorageDirectory().toString() + "/Orbis"; // TODO: Environment.getExternalStorageDirectory() is the build-in external storage
-        File directory = new File(path);
-        File[] files = directory.listFiles();
-        if(files == null) {
-            images = null;
-        } else if(files.length == 0) {
-            images = null;
-        } else {
-            ArrayList<File> imageFiles = new ArrayList<File>();
-            for(File file : files) {
-                if (isImageExtension(file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1, file.getAbsolutePath().length()))) {
-                    imageFiles.add(file);
-                }
-            }
-            images = toFileArray(imageFiles.toArray());
-            selectedItems = new boolean[images.length];
-        }
+        loadFolderIntoGallery(path);
 
         findViewById(R.id.gallery_scroll).getViewTreeObserver().addOnScrollChangedListener(this);
 
@@ -78,6 +63,32 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
             findViewById(R.id.gallery_scroll).setScrollY(savedInstanceState.getInt(STATE_SCROLL_POSITION));
         }
 
+    }
+
+    private void loadFolderIntoGallery(String path) {
+        File directory = new File(path);
+        if(directory.exists()) {
+            File[] files = directory.listFiles();
+            if(files == null) {
+                images = null;
+            } else if(files.length == 0) {
+                images = new File[0];
+                selectedItems = new boolean[0];
+            } else {
+                ArrayList<File> imageFiles = new ArrayList<File>();
+                for(File file : files) {
+                    if (isImageExtension(file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1, file.getAbsolutePath().length()))) {
+                        imageFiles.add(file);
+                    }
+                }
+                images = toFileArray(imageFiles.toArray());
+                selectedItems = new boolean[images.length];
+            }
+        } else {
+            directory.mkdir();
+            images = new File[0];
+            selectedItems = new boolean[0];
+        }
     }
 
     @Override
