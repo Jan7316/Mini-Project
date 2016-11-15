@@ -95,7 +95,7 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
 
     @Override
     public void onImagesLoaded(Bitmap left, Bitmap right) {
-        filter.setImageWidthToHeightRatio((float)right.getWidth()/right.getHeight());
+        filter.setImageWidthToHeightRatio((float)left.getWidth()/left.getHeight());
         leftImage.setImage(left);
         rightImage.setImage(right);
     }
