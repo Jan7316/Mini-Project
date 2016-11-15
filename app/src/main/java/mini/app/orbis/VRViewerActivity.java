@@ -20,6 +20,7 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
     private VRViewerProperties properties;
     private DistortionCorrectionFilter filter;
     private String path;
+    private GPUImage leftImage, rightImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,21 +35,21 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
 
         path = getIntent().getStringExtra(GlobalVars.EXTRA_PATH);
 
-        /*new AsyncTaskLoadVRImage(this, path).execute();*/
+        new AsyncTaskLoadVRImage(this, path).execute();
 
-        /*Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.id.loading_indicator);
-        createGPUImage(bitmap, R.id.leftView, false);
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.id.loading_indicator);
+        leftImage = createGPUImage(bitmap, R.id.leftView);
         bitmap = BitmapFactory.decodeResource(getResources(), R.id.loading_indicator);
-        createGPUImage(bitmap, R.id.rightView, false);*/
+        rightImage = createGPUImage(bitmap, R.id.rightView);
 
-        Bitmap bitmap = BitmapFactory.decodeFile(path);
+        /*Bitmap bitmap = BitmapFactory.decodeFile(path);
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
         Bitmap left = Bitmap.createBitmap(bitmap, 0, 0, width / 2, height); // This may or may not work with .jps files
         Bitmap right = Bitmap.createBitmap(bitmap, width / 2, 0, width / 2 - 1, height);
         createGPUImage(left, R.id.leftView);
         createGPUImage(right, R.id.rightView);
-        filter.setImageWidthToHeightRatio((float)left.getWidth()/left.getHeight());
+        filter.setImageWidthToHeightRatio((float)left.getWidth()/left.getHeight());*/
 
         //filter.setImageWidthToHeightRatio((float)bitmap.getWidth()/bitmap.getHeight());
     }
@@ -94,8 +95,8 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
 
     @Override
     public void onImagesLoaded(Bitmap left, Bitmap right) {
-        createGPUImage(left, R.id.leftView);
-        createGPUImage(right, R.id.rightView);
+        leftImage.setImage(left);
+        rightImage.setImage(right);
         filter.setImageWidthToHeightRatio((float)right.getWidth()/right.getHeight());
     }
 
