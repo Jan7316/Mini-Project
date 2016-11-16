@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 public class GalleryActivity extends AppCompatActivity implements GalleryItemFragment.OnFragmentInteractionListener, ViewTreeObserver.OnScrollChangedListener {
 
-    private final String[] IMG_EXTENSIONS = {"jpg", "png", "gif", "bmp", "webp"};
+    private final String[] IMG_EXTENSIONS = {"jpg", "png", "gif", "bmp", "webp", "jps"}; // TODO eventually, this should only accept .jps files
 
     private boolean reInitFragments, alreadyInitializedSpaces;
 
