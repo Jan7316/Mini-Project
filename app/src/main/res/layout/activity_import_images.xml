@@ -25,9 +25,12 @@
             <LinearLayout
                 android:layout_width="@dimen/import_activity_item_width"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:onClick="startImageCapture">
 
-                <ImageView
+            <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:src="@drawable/text_take_image"
@@ -100,6 +103,6 @@
         android:background="@null"
         android:layout_marginRight="@dimen/import_activity_cancel_button_margin_right"
         android:layout_marginBottom="@dimen/import_activity_cancel_button_margin_bottom"
-        android:textSize="@dimen/import_activity_cancel_button_font_size"/>
+        android:textSize="@dimen/button_font_size"/>
 
 </RelativeLayout>

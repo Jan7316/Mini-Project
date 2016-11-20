@@ -12,4 +12,7 @@ public class GlobalVars {
     public static final String FILE_REFERENCES_PREFERENCE_FILE = "filerefs";
 
     public static final int REQUEST_CODE_FILE_PERMISSION = 1;
+
+    public static final int INTENT_CAPTURE_LEFT = 1;
+    public static final int INTENT_CAPTURE_RIGHT = 2;
 }

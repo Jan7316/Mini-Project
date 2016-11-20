@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
           package="mini.app.orbis">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -32,6 +31,9 @@
             android:screenOrientation="landscape"
             android:theme="@style/AppTheme"/>
         <activity android:name=".ImportActivity"
+                  android:screenOrientation="landscape">
+        </activity>
+        <activity android:name=".ViewCaptureActivity"
                   android:screenOrientation="landscape">
         </activity>
     </application>

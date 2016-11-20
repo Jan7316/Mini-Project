@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_loading_image"
+            android:id="@+id/image"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/button_font_size"
+                android:text="@string/image_name"
+                android:textColor="@color/colorText"
+                android:id="@+id/image_name_label"/>
+
+            <EditText
+                android:layout_width="@dimen/text_field_width"
+                android:layout_height="wrap_content"
+                android:id="@+id/image_name"
+                android:hint="@string/image_name_hint"
+                android:textSize="@dimen/button_font_size"
+                android:textColor="@color/colorText"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/button_font_size"
+                android:background="@null"
+                android:text="@string/save"
+                android:textColor="@color/colorButton"
+                android:id="@+id/save"
+                android:onClick="save"/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/button_font_size"
+                android:background="@null"
+                android:text="@string/discard"
+                android:textColor="@color/colorButton"
+                android:id="@+id/discard"
+                android:onClick="discard"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
