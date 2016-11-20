@@ -1,9 +1,18 @@
 package mini.app.orbis;
 
+import android.*;
+import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -56,6 +65,11 @@ public class MainMenuActivity extends AppCompatActivity {
         logo.setAnimation(fadeIn);
         logo_text.setAnimation(logoTextAnimations);
         menu.setAnimation(fadeInMenu);
+
+        View decorView = getWindow().getDecorView();
+        // Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
     }
 
     @Override
@@ -68,9 +82,44 @@ public class MainMenuActivity extends AppCompatActivity {
         decorView.setSystemUiVisibility(uiOptions);
     }
 
-    public void toGallery(View view) { // TODO check file access permission before opening gallery
-        Intent intent = new Intent(this, GalleryActivity.class);
-        startActivity(intent);
+    public void toGallery(View view) {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    GlobalVars.REQUEST_CODE_FILE_PERMISSION);
+        } else {
+            Intent intent = new Intent(this, GalleryActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case GlobalVars.REQUEST_CODE_FILE_PERMISSION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+
+                    Intent intent = new Intent(this, GalleryActivity.class);
+                    startActivity(intent);
+                } else {
+                    AlertDialog dialog = new AlertDialog.Builder(this)
+                            .setTitle("App Permissions")
+                            .setMessage("The app requires both of these permissions in order to display images in the gallery and save pictures that you took with the 3D camera." +
+                                        "Please grant them in order to proceed.")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setNeutralButton("Dismiss", null).create();
+                    dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+                    dialog.show();
+                    dialog.getWindow().getDecorView().setSystemUiVisibility(
+                            this.getWindow().getDecorView().getSystemUiVisibility());
+                    dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+                }
+            }
+        }
     }
 
 }

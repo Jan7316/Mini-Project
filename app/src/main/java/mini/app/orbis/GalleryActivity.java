@@ -3,8 +3,6 @@ package mini.app.orbis;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -22,17 +20,12 @@ import com.github.angads25.filepicker.model.DialogProperties;
 import com.github.angads25.filepicker.view.FilePickerDialog;
 
 import java.io.File;
-import java.util.ArrayList;
 
 public class GalleryActivity extends AppCompatActivity implements GalleryItemFragment.OnFragmentInteractionListener, ViewTreeObserver.OnScrollChangedListener {
-
-    private final String[] IMG_EXTENSIONS = {"jpg", "png", "gif", "bmp", "webp", "jps"}; // TODO eventually, this should only accept .jps files
 
     private boolean reInitFragments, alreadyInitializedSpaces;
 
     private final String STATE_SCROLL_POSITION = "SCROLL_POSITION";
-
-    public File[] images;
 
     private int[] spaceViewIds;
 
@@ -47,48 +40,28 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
 
-        String path = Environment.getExternalStorageDirectory().toString() + "/Orbis"; // TODO: Environment.getExternalStorageDirectory() is the build-in external storage
-        loadFolderIntoGallery(path);
+        if(FileManager.getFiles(this).length == 0) {
+            findViewById(R.id.gallery_scroll).setBackgroundResource(R.drawable.gallery_helper);
+        }
 
         findViewById(R.id.gallery_scroll).getViewTreeObserver().addOnScrollChangedListener(this);
 
         if(savedInstanceState == null) {
-            for(int i = 0; i < Math.min(viewportHeightInGridRows() * columnCount(), images.length); i++) {
+            for(int i = 0; i < viewportHeightInGridRows() * columnCount(); i++) {
                 GalleryItemFragment firstFragment = GalleryItemFragment.newInstance(i);
                 getSupportFragmentManager().beginTransaction().add(R.id.gallery_container, firstFragment).commit();
             }
 
-            findViewById(R.id.actions).setVisibility(View.GONE);
+            findViewById(R.id.delete).setVisibility(View.GONE);
+            findViewById(R.id.share).setVisibility(View.GONE);
         } else {
             findViewById(R.id.gallery_scroll).setScrollY(savedInstanceState.getInt(STATE_SCROLL_POSITION));
         }
 
-    }
-
-    private void loadFolderIntoGallery(String path) {
-        File directory = new File(path);
-        if(directory.exists()) {
-            File[] files = directory.listFiles();
-            if(files == null) {
-                images = null;
-            } else if(files.length == 0) {
-                images = new File[0];
-                selectedItems = new boolean[0];
-            } else {
-                ArrayList<File> imageFiles = new ArrayList<File>();
-                for(File file : files) {
-                    if (isImageExtension(file.getAbsolutePath().substring(file.getAbsolutePath().lastIndexOf(".") + 1, file.getAbsolutePath().length()))) {
-                        imageFiles.add(file);
-                    }
-                }
-                images = toFileArray(imageFiles.toArray());
-                selectedItems = new boolean[images.length];
-            }
-        } else {
-            directory.mkdir();
-            images = new File[0];
-            selectedItems = new boolean[0];
-        }
+        View decorView = getWindow().getDecorView();
+        // Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
     }
 
     @Override
@@ -107,6 +80,8 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         decorView.setSystemUiVisibility(uiOptions);
 
         reInitFragments = true;
+
+        updateFragmentImages(); // functionality not yet checked, supposed to apply any changes made to the file list while in ImportActivity to the fragments in here
     }
 
     public synchronized void notifyImageLoaded(int cellID, String imageID) {
@@ -114,16 +89,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         if(getCellIdForFragment(indexOfFragment(fragment)) == cellID) {
             fragment.applyImage(cellID, Cache.getBitmapFromMemCache(imageID));
             Log.d("Orbis", "Image was applied for cell " + cellID);
-        } else {
         }
-    }
-
-    private boolean isImageExtension(String ext) {
-        for (String img_extension : IMG_EXTENSIONS) {
-            if (ext.equals(img_extension))
-                return true;
-        }
-        return false;
     }
 
     @Override
@@ -132,6 +98,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         int topGridRow = scrollDistanceToGridRow(currentTop);
 
         if(!alreadyInitializedSpaces) {
+            File[] images = FileManager.getFiles(this);
             int numberRequired = images.length / columnCount() + (images.length % columnCount() > 0 ? 1 : 0);
             spaceViewIds = new int[numberRequired];
             for(int i=0;i<numberRequired;i++) {
@@ -156,27 +123,65 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
     }
 
     public void updateSpaces() {
+        File[] images = FileManager.getFiles(this);
         int numberRequired = images.length / columnCount() + (images.length % columnCount() > 0 ? 1 : 0);
         if(numberRequired < spaceViewIds.length) {
             int[] newSpaceList = new int[numberRequired];
-            for(int i=0;i<numberRequired; i++) {
-                newSpaceList[i] = spaceViewIds[i];
-            }
+            System.arraycopy(spaceViewIds, 0, newSpaceList, 0, numberRequired);
             for(int i=numberRequired;i<spaceViewIds.length;i++) {
                 ((GridLayout) findViewById(R.id.gallery_container)).removeView(findViewById(spaceViewIds[i]));
             }
             spaceViewIds = newSpaceList;
         } else if(numberRequired > spaceViewIds.length) {
-            // TODO
+            int[] newSpaceList = new int[numberRequired];
+            System.arraycopy(spaceViewIds, 0, newSpaceList, 0, spaceViewIds.length);
+            for(int i=spaceViewIds.length;i<numberRequired;i++) {
+                Space space = new Space(this);
+                int viewID = View.generateViewId();
+                newSpaceList[i] = viewID;
+                space.setId(viewID);
+                GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+                layoutParams.height = ((GalleryItemFragment) getSupportFragmentManager().getFragments().get(0)).getHeight();
+                layoutParams.width = 1;
+                layoutParams.columnSpec = GridLayout.spec(3);
+                layoutParams.rowSpec = GridLayout.spec(i);
+                space.setLayoutParams(layoutParams);
+                ((GridLayout) findViewById(R.id.gallery_container)).addView(space);
+            }
+            spaceViewIds = newSpaceList;
         }
     }
 
     @Override
     public void onFragmentInflated(GalleryItemFragment fragment, View view) {
-        applyScrollToFragment(indexOfFragment(fragment), getCellIdForFragment(indexOfFragment(fragment)), 0, false, view); // TODO this does nothing, or at least not what it is supposed to do
+        Log.d("Orbis", "Fragment " + indexOfFragment(fragment) + " was inflated");
+        applyScrollToFragment(indexOfFragment(fragment), getCellIdForFragment(indexOfFragment(fragment)), 0, false, view);
     }
 
     private void applyScrollToFragment(int fragmentID, int cellID, int topRow, boolean forceImageUpdate, View fragmentView) {
+
+        if(!alreadyInitializedSpaces) {
+            File[] images = FileManager.getFiles(this);
+            int numberRequired = images.length / columnCount() + (images.length % columnCount() > 0 ? 1 : 0);
+            spaceViewIds = new int[numberRequired];
+            for(int i=0;i<numberRequired;i++) {
+                Space space = new Space(this);
+                int viewID = View.generateViewId();
+                spaceViewIds[i] = viewID;
+                space.setId(viewID);
+                GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+                layoutParams.height = ((GalleryItemFragment) getSupportFragmentManager().getFragments().get(0)).getHeight();
+                layoutParams.width = 1;
+                layoutParams.columnSpec = GridLayout.spec(3);
+                layoutParams.rowSpec = GridLayout.spec(i);
+                space.setLayoutParams(layoutParams);
+                ((GridLayout) findViewById(R.id.gallery_container)).addView(space);
+            }
+            alreadyInitializedSpaces = true;
+        }
+
+        if(fragmentID == -1) // Can happen if the user returns to the menu while some fragment have not yet finished inflating
+            return;
 
         GalleryItemFragment fragment = (GalleryItemFragment) getSupportFragmentManager().getFragments().get(fragmentID);
 
@@ -191,6 +196,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         if(!(!(fragment.getCurrentCellID() == cellID) || reInitFragments || forceImageUpdate)) {
             // The fragment is already displaying the correct image
         } else {
+            File[] images = FileManager.getFiles(this);
             if(cellID >= images.length) {
                 fragmentView.setVisibility(View.INVISIBLE);
                 fragment.setCellID(cellID);
@@ -200,7 +206,8 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
             fragment.setCellID(cellID);
 
             fragmentView.setVisibility(View.VISIBLE);
-            String filename = images[cellID].getName(); // TODO compatibility with duplicate file names (eg example.jpg/example.png)
+            String filename = images[cellID].getName();
+            Log.d("Orbis", "The file for fragment " + fragmentID + " is " + filename);
             if(Cache.isBitmapCached(filename)) {
                 Log.d("Orbis", "Loading from cache " + fragmentID);
                 fragment.applyImage(cellID, Cache.getBitmapFromMemCache(filename), fragmentView);
@@ -221,11 +228,19 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
     }
 
     /**
-     * To be called when images were delete, a new image created or another folder opened
+     * To be called when images were deleted, a new image created or another folder opened
      */
     private void updateFragmentImages() {
         for(int i=0;i<getSupportFragmentManager().getFragments().size();i++) {
             applyScrollToFragment(i, getCellIdForFragment(i), scrollDistanceToGridRow(findViewById(R.id.gallery_scroll).getScrollY()), true, null);
+        }
+        File[] images = FileManager.getFiles(this);
+        if(images != null) {
+            if(images.length == 0) {
+                findViewById(R.id.gallery_scroll).setBackgroundResource(R.drawable.gallery_helper);
+            } else {
+                findViewById(R.id.gallery_scroll).setBackgroundResource(0);
+            }
         }
     }
 
@@ -274,20 +289,12 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
 
     public int indexOfFragment(GalleryItemFragment fragment) {
         //return getSupportFragmentManager().getFragments().indexOf(fragment);
-        return fragment.getFragmentID();
-    }
-
-    public File[] toFileArray(Object[] array) {
-        File[] a = new File[array.length];
-        for(int i=0;i<array.length;i++) {
-            a[i] = (File) array[i];
-        }
-        return a;
+        return fragment == null ? -1 : fragment.getFragmentID();
     }
 
     @Override
     public boolean isItemSelected(int itemID) {
-        return selectedItems[itemID];
+        return getSelectedItems()[itemID];
     }
 
     public void invertSelectionStatus(int itemID) {
@@ -303,11 +310,11 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
             selectionMode = true;
             showActionBarIcons();
         }
-        selectedItems[itemID] = true;
+        setSelectionStatus(itemID, true);
     }
 
     public void deselectItem(int itemID) {
-        selectedItems[itemID] = false;
+        setSelectionStatus(itemID, false);
         if(getNumberOfSelectedItems() == 0) {
             selectionMode = false;
             hideActionBarIcons();
@@ -317,23 +324,31 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
     public void showActionBarIcons() {
         Animation fadeIn = new AlphaAnimation(0, 1);
         fadeIn.setDuration(500);
-        View actionBarItems = findViewById(R.id.actions);
-        actionBarItems.setVisibility(View.VISIBLE);
-        actionBarItems.startAnimation(fadeIn);
+        View deleteIcon = findViewById(R.id.delete);
+        deleteIcon.setVisibility(View.VISIBLE);
+        deleteIcon.startAnimation(fadeIn);
+        View shareIcon = findViewById(R.id.share);
+        shareIcon.setVisibility(View.VISIBLE);
+        shareIcon.startAnimation(fadeIn);
     }
 
     public void hideActionBarIcons() {
+        fadeOutIcon(findViewById(R.id.delete));
+        fadeOutIcon(findViewById(R.id.share));
+    }
+
+    private void fadeOutIcon(View view) {
         Animation fadeOut = new AlphaAnimation(1, 0);
         fadeOut.setDuration(500);
-        final View actionBarItems = findViewById(R.id.actions);
+        final View icon = view;
         fadeOut.setAnimationListener(new Animation.AnimationListener(){
             public void onAnimationStart(Animation anim) {}
             public void onAnimationRepeat(Animation anim) {}
             public void onAnimationEnd(Animation anim) {
-                actionBarItems.setVisibility(View.GONE);
+                icon.setVisibility(View.GONE);
             }
         });
-        actionBarItems.startAnimation(fadeOut);
+        icon.startAnimation(fadeOut);
     }
 
     public void deleteSelectedItems(View view) {
@@ -347,20 +362,8 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
                     public void onClick(DialogInterface dialog, int whichButton) {
                         Log.d("Orbis", "Delete pictures");
 
-                        int[] indices = Util.allIndices(true, selectedItems);
-                        File[] newImages = new File[images.length - getNumberOfSelectedItems()];
-                        int j=0;
-                        for(int i=0;i<images.length;i++) {
-                            if(!Util.contains(indices, i)) {
-                                newImages[j] = images[i];
-                                j++;
-                            }
-                        }
-                        images = newImages;
-                        selectedItems = new boolean[newImages.length];
-                        updateFragmentImages();
-                        hideActionBarIcons();
-                        updateSpaces();
+                        int[] indices = Util.allIndices(true, getSelectedItems());
+                        deleteItems(indices);
                     }})
                 .setNegativeButton(android.R.string.cancel, null).create();
         dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
@@ -370,12 +373,20 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
     }
 
+    private void deleteItems(int[] indices) {
+        FileManager.deleteItems(this, indices);
+
+        updateFragmentImages();
+        hideActionBarIcons();
+        updateSpaces();
+    }
+
     public void shareSelectedItems(View view) {
         // TODO
     }
 
     public int getNumberOfSelectedItems() {
-        return Util.count(selectedItems, true);
+        return Util.count(getSelectedItems(), true);
     }
 
     @Override
@@ -395,7 +406,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
 
     private void openImageInVRViewer(int itemID) {
         Intent intent = new Intent(this, VRViewerActivity.class);
-        intent.putExtra(GlobalVars.EXTRA_PATH, images[itemID].getAbsolutePath());
+        intent.putExtra(GlobalVars.EXTRA_PATH, FileManager.getFiles(this)[itemID].getAbsolutePath());
         startActivity(intent);
     }
 
@@ -403,6 +414,10 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         finish();
     }
 
+    /**
+     * This functionality was replaced by ImportActivity
+     */
+    @Deprecated
     public void chooseFolder(View view) {
         DialogProperties properties = new DialogProperties();
 
@@ -430,6 +445,30 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
 
         /*Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
         startActivityForResult(intent, FOLDER_CHOOSER_INTENT_ID);*/
+    }
+
+    public void addItems(View view) {
+        Intent intent = new Intent(this, ImportActivity.class);
+        startActivity(intent);
+    }
+
+    private boolean[] getSelectedItems() {
+        if(selectedItems == null) {
+            selectedItems = new boolean[FileManager.getFiles(this).length];
+            return selectedItems;
+        }
+        if(selectedItems.length == FileManager.getFiles(this).length) {
+            return selectedItems;
+        }
+        selectedItems = new boolean[FileManager.getFiles(this).length];
+        return selectedItems;
+    }
+
+    private void setSelectionStatus(int item, boolean status) {
+        getSelectedItems(); // Make sure selected items are initialised
+        if(item >= selectedItems.length)
+            return;
+        selectedItems[item] = status;
     }
 
 }

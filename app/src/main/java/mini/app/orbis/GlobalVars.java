@@ -9,4 +9,7 @@ public class GlobalVars {
     public static final String EXTRA_PATH = "path";
     public static final String FRAGMENT_ID = "id";
 
+    public static final String FILE_REFERENCES_PREFERENCE_FILE = "filerefs";
+
+    public static final int REQUEST_CODE_FILE_PERMISSION = 1;
 }

@@ -42,6 +42,11 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
         bitmap = BitmapFactory.decodeResource(getResources(), R.id.loading_indicator);
         rightImage = createGPUImage(bitmap, R.id.rightView);
 
+        View decorView = getWindow().getDecorView();
+        // Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+
         /*Bitmap bitmap = BitmapFactory.decodeFile(path);
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();

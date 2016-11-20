@@ -42,7 +42,8 @@
                     android:textColor="@color/colorText"
                     android:textSize="@dimen/title_bar_text_size"
                     android:textStyle="bold"
-                    android:layout_marginLeft="@dimen/gallery_back_button_margin"/>
+                    android:layout_marginLeft="@dimen/gallery_back_button_margin"
+                    android:id="@+id/title"/>
             </LinearLayout>
 
             <LinearLayout
@@ -70,6 +71,16 @@
                     android:scaleType="fitXY"
                     android:src="@drawable/trash"
                     android:onClick="deleteSelectedItems"
+                    android:background="?attr/selectableItemBackgroundBorderless" />
+
+                <ImageButton
+                    android:id="@+id/add"
+                    android:layout_width="@dimen/gallery_action_button_size"
+                    android:layout_height="@dimen/gallery_action_button_size"
+                    android:layout_marginRight="@dimen/gallery_action_button_margin_right"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/plus_circle"
+                    android:onClick="addItems"
                     android:background="?attr/selectableItemBackgroundBorderless" />
             </LinearLayout>
         </RelativeLayout>
