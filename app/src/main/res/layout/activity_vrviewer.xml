@@ -1,30 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="mini.app.orbis.VRViewerActivity">
 
-    <RelativeLayout
-        android:layout_width="0dp"
+    <mini.app.orbis.VRView
+        android:id="@+id/vrView"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1">
-        <android.opengl.GLSurfaceView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:id="@+id/leftView" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-        <android.opengl.GLSurfaceView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:id="@+id/rightView" />
-    </RelativeLayout>
-</LinearLayout>
+        android:layout_centerInParent="true"/>
+</RelativeLayout>
