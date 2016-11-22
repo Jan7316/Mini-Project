@@ -1,7 +1,10 @@
 package mini.app.orbis;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
+import android.util.AttributeSet;
 
 /**
  * @author JS
@@ -9,14 +12,15 @@ import android.opengl.GLSurfaceView;
  */
 
 public class VRView extends GLSurfaceView {
-    VRRenderer renderer;
-    public VRView(Context context) {
+    private final VRRenderer renderer;
+    public VRView(Context context, Bitmap image) {
         super(context);
         setEGLContextClientVersion(2);
-    }
-    public void setRenderer(VRRenderer renderer) {
-        this.renderer = renderer;
+        renderer = new VRRenderer(new VRViewerProperties(), image);
         setRenderer(renderer);
-        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        setRenderMode(RENDERMODE_WHEN_DIRTY);
+    }
+    public void setImage(Bitmap image) {
+        renderer.setImage(image);
     }
 }

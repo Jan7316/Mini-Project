@@ -2,11 +2,13 @@ package mini.app.orbis;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 /**
  * @author JS
@@ -15,26 +17,26 @@ import android.view.ViewGroup;
 
 public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoadVRImage.ITaskParent {
     private VRViewerProperties properties;
-    private VRRenderer renderer;
+    //private VRRenderer renderer;
+    private VRView view;
     private String path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_vrviewer);
 
-        // Initialize renderer and attach it to the view
         properties = new VRViewerProperties();
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.id.loading_indicator);
-        renderer = new VRRenderer(properties, bitmap);
-        VRView view = (VRView) findViewById(R.id.vrView);
-        view.setRenderer(renderer);
 
-        // Adjust absolute dimensions of the view
-        ViewGroup.LayoutParams params = view.getLayoutParams();
-        params.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_MM,
-                properties.interLensDistM*1000*2, getResources().getDisplayMetrics());;
-        view.setLayoutParams(params);
+        RelativeLayout layout = new RelativeLayout(this);
+        view = new VRView(this, BitmapFactory.decodeFile(getIntent().getStringExtra(GlobalVars.EXTRA_PATH)));
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        layoutParams.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_MM,
+                properties.interLensDistM*1000*2, getResources().getDisplayMetrics());
+        view.setLayoutParams(layoutParams);
+        layout.addView(view);
+
+        setContentView(layout);
 
         path = getIntent().getStringExtra(GlobalVars.EXTRA_PATH);
         new AsyncTaskLoadVRImage(this, path).execute();
@@ -60,6 +62,6 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
 
     @Override
     public void onImagesLoaded(Bitmap image) {
-        renderer.setImage(image);
+        view.setImage(image);
     }
 }

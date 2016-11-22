@@ -122,6 +122,10 @@ public class VRRenderer implements GLSurfaceView.Renderer{
      */
     public void setImage(Bitmap image) {
         this.image = image;
+        /*int[] textureHandleArray = new int[1];
+        GLES20.glGenTextures(1,textureHandleArray,0);
+        glTextureDataHandle = textureHandleArray[0];
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glTextureDataHandle);*/
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
     }
 
