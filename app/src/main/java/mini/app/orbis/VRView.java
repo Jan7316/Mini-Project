@@ -1,19 +1,17 @@
-package mini.app.orbis.VRImaging;
+package mini.app.orbis;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 
 /**
  * @author JS
+ * A placeholder implementation, enables further extensions in newer versions
  */
 
 public class VRView extends GLSurfaceView {
-    private final VRRenderer renderer;
-
     public VRView(Context context) {
         super(context);
-        renderer = new VRRenderer();
-        setRenderer(renderer);
-        setRenderMode(RENDERMODE_WHEN_DIRTY);
+        setEGLContextClientVersion(2);
+        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 }
