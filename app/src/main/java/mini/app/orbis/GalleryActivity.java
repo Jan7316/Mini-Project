@@ -2,6 +2,7 @@ package mini.app.orbis;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -51,12 +52,12 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
                 GalleryItemFragment firstFragment = GalleryItemFragment.newInstance(i);
                 getSupportFragmentManager().beginTransaction().add(R.id.gallery_container, firstFragment).commit();
             }
-
-            findViewById(R.id.delete).setVisibility(View.GONE);
-            findViewById(R.id.share).setVisibility(View.GONE);
         } else {
             findViewById(R.id.gallery_scroll).setScrollY(savedInstanceState.getInt(STATE_SCROLL_POSITION));
         }
+
+        findViewById(R.id.delete).setVisibility(View.GONE);
+        findViewById(R.id.share).setVisibility(View.GONE);
 
         View decorView = getWindow().getDecorView();
         // Hide the status bar.
@@ -309,11 +310,16 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         if(getNumberOfSelectedItems() == 0) {
             selectionMode = true;
             showActionBarIcons();
+        } else if(getNumberOfSelectedItems() == 1) {
+            hideShareIcon();
         }
         setSelectionStatus(itemID, true);
     }
 
     public void deselectItem(int itemID) {
+        if(getNumberOfSelectedItems() == 2) {
+            showShareIcon();
+        }
         setSelectionStatus(itemID, false);
         if(getNumberOfSelectedItems() == 0) {
             selectionMode = false;
@@ -321,9 +327,11 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         }
     }
 
+    private final int ANIMATION_DURATION = 500;
+
     public void showActionBarIcons() {
         Animation fadeIn = new AlphaAnimation(0, 1);
-        fadeIn.setDuration(500);
+        fadeIn.setDuration(ANIMATION_DURATION);
         View deleteIcon = findViewById(R.id.delete);
         deleteIcon.setVisibility(View.VISIBLE);
         deleteIcon.startAnimation(fadeIn);
@@ -337,9 +345,21 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         fadeOutIcon(findViewById(R.id.share));
     }
 
+    public void showShareIcon() {
+        Animation fadeIn = new AlphaAnimation(0, 1);
+        fadeIn.setDuration(ANIMATION_DURATION);
+        View shareIcon = findViewById(R.id.share);
+        shareIcon.setVisibility(View.VISIBLE);
+        shareIcon.startAnimation(fadeIn);
+    }
+
+    public void hideShareIcon() {
+        fadeOutIcon(findViewById(R.id.share));
+    }
+
     private void fadeOutIcon(View view) {
         Animation fadeOut = new AlphaAnimation(1, 0);
-        fadeOut.setDuration(500);
+        fadeOut.setDuration(ANIMATION_DURATION);
         final View icon = view;
         fadeOut.setAnimationListener(new Animation.AnimationListener(){
             public void onAnimationStart(Animation anim) {}
@@ -382,7 +402,13 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
     }
 
     public void shareSelectedItems(View view) {
-        // TODO
+        if(getNumberOfSelectedItems() == 1) {
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("image/jpeg");
+            int index = Util.allIndices(true, getSelectedItems())[0]; // There should be only one index
+            share.putExtra(Intent.EXTRA_STREAM, Uri.parse(FileManager.getFiles(this)[index].getAbsolutePath())); // TODO apparently the file is empty (GMail) and the file type not supported (WhatsApp)
+            startActivity(Intent.createChooser(share, "Share Image"));
+        }
     }
 
     public int getNumberOfSelectedItems() {

@@ -1,9 +1,12 @@
 package mini.app.orbis;
 
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -19,6 +22,8 @@ import java.util.regex.Pattern;
 public class ViewCaptureActivity extends AppCompatActivity {
 
     private String temporaryImagePath = "";
+
+    private EditText filename;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +44,18 @@ public class ViewCaptureActivity extends AppCompatActivity {
 
         temporaryImagePath = getIntent().getStringExtra(GlobalVars.EXTRA_PATH);
         ((ImageView) findViewById(R.id.image)).setImageBitmap(BitmapFactory.decodeFile(temporaryImagePath));
+
+        filename = (EditText) findViewById(R.id.image_name);
+        filename.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                onFilenameChanged(s.toString());
+            }
+        });
     }
 
     @Override
@@ -70,6 +87,7 @@ public class ViewCaptureActivity extends AppCompatActivity {
         moveFile(temporaryImagePath, Environment.getExternalStorageDirectory().toString() + "/Orbis/" + fileName + ".jps");
         FileManager.updateFolderFiles(this);
         finish();
+        setResult(GlobalVars.RESULT_FINISH_PARENT);
     }
 
     public void discard(View view) {
@@ -103,7 +121,32 @@ public class ViewCaptureActivity extends AppCompatActivity {
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
 
+    private void onFilenameChanged(String newText) {
+        switch(getTextStatus(newText)) {
+            case -1:
+                filename.setBackgroundColor(Color.argb(50, 255, 0, 0));
+                break;
+            case 0:
+                filename.setBackgroundColor(Color.argb(0, 0, 0, 0));
+                break;
+            case 1:
+                filename.setBackgroundColor(Color.argb(50, 0, 255, 0));
+                break;
+        }
+    }
+
+    private int getTextStatus(String text) {
+        if(text.length() == 0) {
+            return 0;
+        }
+        String regex = "[^a-zA-Z0-9æøåÆØÅ_ -]";
+        Pattern p = Pattern.compile(regex);
+        if(p.matcher(text).find()) {
+            return -1;
+        }
+        return 1;
     }
 
 }

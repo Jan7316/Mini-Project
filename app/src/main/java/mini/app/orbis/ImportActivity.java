@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
@@ -36,6 +37,7 @@ public class ImportActivity extends AppCompatActivity {
         decorView.setSystemUiVisibility(uiOptions);
 
         FontManager.applyFontToView(this, (Button) findViewById(R.id.cancel), FontManager.Font.lato);
+        FontManager.applyFontToView(this, (TextView) findViewById(R.id.title), FontManager.Font.lato_light);
     }
 
     @Override
@@ -101,9 +103,7 @@ public class ImportActivity extends AppCompatActivity {
      * true: right
      */
     private void takePicture(boolean side) {
-        File storageDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES);
-        String pictureImagePath = storageDir.getAbsolutePath() + "/.temp/Orbis/latest_capture_" + (side ? "right" : "left") + ".jpg";
+        String pictureImagePath =  Environment.getExternalStorageDirectory().toString() + "/Orbis/.temp/latest_capture_" + (side ? "right" : "left") + ".jpg";
         File file = new File(pictureImagePath);
         Uri outputFileUri = Uri.fromFile(file);
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
@@ -113,20 +113,19 @@ public class ImportActivity extends AppCompatActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch(requestCode) {
-            case 1:
+            case GlobalVars.INTENT_CAPTURE_LEFT:
                 if(resultCode == RESULT_OK) {
                     takePicture(true);
                 } else {
                     // TODO image capture failed/was cancelled
                 }
                 break;
-            case 2:
+            case GlobalVars.INTENT_CAPTURE_RIGHT:
                 if(resultCode != RESULT_OK) {
                     break; // TODO image capture failed/was cancelled
                 }
-                File storageDir = Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_PICTURES);
-                String basePath = storageDir.getAbsolutePath() + "/.temp/Orbis/latest_capture_";
+                String orbisTempPath = Environment.getExternalStorageDirectory().toString() + "/Orbis/.temp";
+                String basePath = orbisTempPath + "/latest_capture_";
                 String pathLeft = basePath + "left.jpg";
                 String pathRight = basePath + "right.jpg";
                 File left = new  File(pathLeft);
@@ -137,7 +136,7 @@ public class ImportActivity extends AppCompatActivity {
                     Bitmap combined = combineImages(leftBitmap, rightBitmap);
 
                     FileOutputStream out = null;
-                    String resultFileName = Environment.getExternalStorageDirectory().toString() + "/Orbis/" + "new_capture.jps"; // TODO include timestamp in file name
+                    String resultFileName = orbisTempPath + "/new_capture.jps";
                     try {
                         out = new FileOutputStream(resultFileName);
                         combined.compress(Bitmap.CompressFormat.JPEG, 100, out); // TODO this is lossless, may lead to very large files
@@ -155,11 +154,16 @@ public class ImportActivity extends AppCompatActivity {
 
                     left.delete();
                     right.delete();
-                    new File(storageDir.getAbsolutePath() + "/.temp/Orbis)").delete(); // delete the temporary folder (does not work at the moment, an empty folder remains)
+                    //new File(storageDir.getAbsolutePath() + "/Orbis/.temp").delete(); // delete the temporary folder (does not work at the moment, an empty folder remains)
 
                     Intent intent = new Intent(this, ViewCaptureActivity.class);
                     intent.putExtra(GlobalVars.EXTRA_PATH, resultFileName);
-                    startActivity(intent);
+                    startActivityForResult(intent, GlobalVars.INTENT_FINISH_PARENT);
+                }
+                break;
+            case GlobalVars.INTENT_FINISH_PARENT: // TODO this does not work yet
+                if(resultCode == GlobalVars.RESULT_FINISH_PARENT) {
+                    finish();
                 }
                 break;
         }

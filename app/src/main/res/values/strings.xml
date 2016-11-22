@@ -9,6 +9,7 @@
     <string name="title_activity_vrviewer">VRViewerActivity</string>
 
     <!-- Import -->
+    <string name="import_activity_title">Add Images</string>
     <string name="image_name">Save as:</string>
     <string name="image_name_hint">e.g. \'3dimage\'</string>
     <string name="save">Save</string>
