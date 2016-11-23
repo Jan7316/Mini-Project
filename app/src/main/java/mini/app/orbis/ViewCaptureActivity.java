@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 public class ViewCaptureActivity extends AppCompatActivity {
 
     private String temporaryImagePath = "";
+    private String temporaryFolderPath = "";
 
     private EditText filename;
 
@@ -35,8 +36,6 @@ public class ViewCaptureActivity extends AppCompatActivity {
         int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
 
-        getIntent().getByteArrayExtra("bitmap");
-
         FontManager.applyFontToView(this, (TextView) findViewById(R.id.image_name_label), FontManager.Font.lato);
         FontManager.applyFontToView(this, (TextView) findViewById(R.id.image_name), FontManager.Font.lato);
         FontManager.applyFontToView(this, (TextView) findViewById(R.id.save), FontManager.Font.lato);
@@ -44,6 +43,7 @@ public class ViewCaptureActivity extends AppCompatActivity {
 
         temporaryImagePath = getIntent().getStringExtra(GlobalVars.EXTRA_PATH);
         ((ImageView) findViewById(R.id.image)).setImageBitmap(BitmapFactory.decodeFile(temporaryImagePath));
+        temporaryFolderPath = Environment.getExternalStorageDirectory().toString() + "/Orbis/.temp";
 
         filename = (EditText) findViewById(R.id.image_name);
         filename.addTextChangedListener(new TextWatcher() {
@@ -71,6 +71,7 @@ public class ViewCaptureActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         new File(temporaryImagePath).delete();
+        new File(temporaryFolderPath).delete();
         super.onDestroy();
     }
 
@@ -86,8 +87,8 @@ public class ViewCaptureActivity extends AppCompatActivity {
         }
         moveFile(temporaryImagePath, Environment.getExternalStorageDirectory().toString() + "/Orbis/" + fileName + ".jps");
         FileManager.updateFolderFiles(this);
-        finish();
         setResult(GlobalVars.RESULT_FINISH_PARENT);
+        finish();
     }
 
     public void discard(View view) {

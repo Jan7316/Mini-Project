@@ -14,4 +14,12 @@
     <string name="image_name_hint">e.g. \'3dimage\'</string>
     <string name="save">Save</string>
     <string name="discard">Discard</string>
+
+    <!-- Combine -->
+    <string name="select_image">Select an image</string>
+    <string name="select">Select</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

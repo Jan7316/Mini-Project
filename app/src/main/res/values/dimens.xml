@@ -38,5 +38,8 @@
     <dimen name="page_title_text_size">40dp</dimen>
     <dimen name="page_title_center_offset">220dp</dimen>
 
+    <!-- Combine images activity -->
+    <dimen name="button_drawable_padding">10dp</dimen>
+
     <dimen name="fab_margin">16dp</dimen>
 </resources>

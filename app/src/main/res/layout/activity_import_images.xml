@@ -68,7 +68,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginLeft="@dimen/import_activity_item_distance"
-                android:layout_marginRight="@dimen/import_activity_item_distance">
+                android:layout_marginRight="@dimen/import_activity_item_distance"
+                android:onClick="combineImages">
 
                 <ImageView
                     android:layout_width="match_parent"

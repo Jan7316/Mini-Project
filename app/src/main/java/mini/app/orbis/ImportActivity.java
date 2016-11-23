@@ -111,6 +111,11 @@ public class ImportActivity extends AppCompatActivity {
         startActivityForResult(cameraIntent, (side ? GlobalVars.INTENT_CAPTURE_RIGHT : GlobalVars.INTENT_CAPTURE_LEFT));
     }
 
+    public void combineImages(View view) {
+        Intent intent = new Intent(this, CombineImagesActivity.class);
+        startActivityForResult(intent, GlobalVars.INTENT_FINISH_PARENT);
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch(requestCode) {
             case GlobalVars.INTENT_CAPTURE_LEFT:
@@ -155,6 +160,7 @@ public class ImportActivity extends AppCompatActivity {
                     left.delete();
                     right.delete();
                     //new File(storageDir.getAbsolutePath() + "/Orbis/.temp").delete(); // delete the temporary folder (does not work at the moment, an empty folder remains)
+                    // shouldn't be deleted at this point as ViewCaptureActivity will load the temporarily stored image from this folder
 
                     Intent intent = new Intent(this, ViewCaptureActivity.class);
                     intent.putExtra(GlobalVars.EXTRA_PATH, resultFileName);
@@ -175,7 +181,6 @@ public class ImportActivity extends AppCompatActivity {
         int width = 1000; // TODO this is a random value
         int height = (int) ((((float)c.getHeight()) / c.getWidth()) * width);
 
-        Log.d("Orbis", "Height: " + height + "; original height: " + c.getHeight() + "; original width: " + c.getWidth());
         c = Bitmap.createScaledBitmap(c, width, height, false);
         s = Bitmap.createScaledBitmap(s, width, height, false);
 

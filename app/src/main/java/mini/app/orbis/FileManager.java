@@ -57,6 +57,7 @@ public class FileManager {
             }
             count++;
         }
+        updateFolderFiles(context);
         for(int i=count;i<getReferencedFiles(context).length;i++) {
             if(Util.contains(indices, i)) {
                 Log.d("Orbis", "References to " + i + " should be removed");
@@ -64,7 +65,6 @@ public class FileManager {
             }
             count++;
         }
-        updateFolderFiles(context);
     }
 
     public static void updateFolderFiles(Context context) {
