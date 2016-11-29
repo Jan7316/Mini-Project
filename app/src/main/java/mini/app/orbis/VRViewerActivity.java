@@ -14,13 +14,13 @@ import android.widget.RelativeLayout;
 /**
  * @author JS
  * Activity that displays a 3D image with distortion correction applied
+ *
  */
 
-public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoadVRImage.ITaskParent {
+public class VRViewerActivity extends AppCompatActivity {// implements AsyncTaskLoadVRImage.ITaskParent {
     private VRViewerProperties properties;
-    //private VRRenderer renderer;
     private VRView view;
-    private String path;
+    //private String path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +39,8 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
 
         setContentView(layout);
 
-        path = getIntent().getStringExtra(GlobalVars.EXTRA_PATH);
-        new AsyncTaskLoadVRImage(this, path).execute();
+        //path = getIntent().getStringExtra(GlobalVars.EXTRA_PATH);
+        //new AsyncTaskLoadVRImage(this, path).execute();
 
         View decorView = getWindow().getDecorView();
         // Hide the status bar.
@@ -48,21 +48,8 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
         decorView.setSystemUiVisibility(uiOptions);
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                            | View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);}
-    }
-
-    @Override
+    /*@Override
     public void onImagesLoaded(Bitmap image) {
         view.setImage(image);
-    }
+    }*/
 }

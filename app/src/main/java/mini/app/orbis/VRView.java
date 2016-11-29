@@ -21,7 +21,7 @@ public class VRView extends GLSurfaceView {
         setRenderer(renderer);
         setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
-    public void setImage(Bitmap image) {
+    /*public void setImage(Bitmap image) {
         renderer.setImage(image);
-    }
+    }*/
 }
