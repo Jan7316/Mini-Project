@@ -19,7 +19,7 @@
     <string name="select_image">Select an image</string>
     <string name="select">Select</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Guides menu -->
+    <string name="guides_menu_title">Orbis Guides</string>
 
 </resources>

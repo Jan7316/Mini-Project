@@ -82,6 +82,11 @@ public class MainMenuActivity extends AppCompatActivity {
         decorView.setSystemUiVisibility(uiOptions);
     }
 
+    public void toGuides(View view) {
+        Intent intent = new Intent(this, GuideMenuActivity.class);
+        startActivity(intent);
+    }
+
     public void toGallery(View view) {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {

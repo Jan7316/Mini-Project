@@ -85,7 +85,7 @@ public class ViewCaptureActivity extends AppCompatActivity {
         if(p.matcher(fileName).find()) {
             return; // TODO show an error dialog (filename contained illegal characters; --> possibly color EditText background in real-time
         }
-        moveFile(temporaryImagePath, Environment.getExternalStorageDirectory().toString() + "/Orbis/" + fileName + ".jps");
+        moveFile(temporaryImagePath, Environment.getExternalStorageDirectory().toString() + "/Orbis/" + fileName + "." + GlobalVars.SAVE_FILE_FORMAT);
         FileManager.updateFolderFiles(this);
         setResult(GlobalVars.RESULT_FINISH_PARENT);
         finish();

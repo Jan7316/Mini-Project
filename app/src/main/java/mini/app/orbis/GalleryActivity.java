@@ -14,6 +14,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.GridLayout;
 import android.widget.Space;
+import android.widget.TextView;
 
 import com.github.angads25.filepicker.controller.DialogSelectionListener;
 import com.github.angads25.filepicker.model.DialogConfigs;
@@ -58,6 +59,8 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
 
         findViewById(R.id.delete).setVisibility(View.GONE);
         findViewById(R.id.share).setVisibility(View.GONE);
+
+        FontManager.applyFontToView(this, (TextView) findViewById(R.id.title), FontManager.Font.lato);
 
         View decorView = getWindow().getDecorView();
         // Hide the status bar.
@@ -404,9 +407,10 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
     public void shareSelectedItems(View view) {
         if(getNumberOfSelectedItems() == 1) {
             Intent share = new Intent(Intent.ACTION_SEND);
-            share.setType("image/jpeg");
+            share.setType("image/jps");
             int index = Util.allIndices(true, getSelectedItems())[0]; // There should be only one index
-            share.putExtra(Intent.EXTRA_STREAM, Uri.parse(FileManager.getFiles(this)[index].getAbsolutePath())); // TODO apparently the file is empty (GMail) and the file type not supported (WhatsApp)
+            //share.putExtra(Intent.EXTRA_STREAM, Uri.parse(FileManager.getFiles(this)[index].getAbsolutePath())); // TODO apparently the file is empty (GMail) and the file type not supported (WhatsApp)
+            share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(FileManager.getFiles(this)[index]));
             startActivity(Intent.createChooser(share, "Share Image"));
         }
     }

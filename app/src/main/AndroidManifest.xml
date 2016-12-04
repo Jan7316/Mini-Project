@@ -39,6 +39,9 @@
         <activity android:name=".CombineImagesActivity"
                   android:screenOrientation="landscape">
         </activity>
+        <activity android:name=".GuideMenuActivity"
+                  android:screenOrientation="landscape">
+        </activity>
     </application>
 
 </manifest>

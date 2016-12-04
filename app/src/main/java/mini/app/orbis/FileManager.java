@@ -3,6 +3,7 @@ package mini.app.orbis;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -177,7 +178,11 @@ public class FileManager {
     }
 
     private static boolean isImageExtension(String ext) {
-        return ext.equalsIgnoreCase("jps");
+        for(String e : GlobalVars.ACCEPTED_FILE_FORMATS) {
+            if(e.equalsIgnoreCase(ext))
+                return true;
+        }
+        return false;
     }
 
     private static File[] toFileArray(Object[] array) {

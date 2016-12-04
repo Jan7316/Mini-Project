@@ -192,7 +192,7 @@ public class CombineImagesActivity extends AppCompatActivity {
         Bitmap combined = combineImages(leftBitmap, rightBitmap);
 
         FileOutputStream out = null;
-        String resultFileName = Environment.getExternalStorageDirectory().toString() + "/Orbis/" + fileName + ".jps";
+        String resultFileName = Environment.getExternalStorageDirectory().toString() + "/Orbis/" + fileName + "." + GlobalVars.SAVE_FILE_FORMAT;
         try {
             out = new FileOutputStream(resultFileName);
             combined.compress(Bitmap.CompressFormat.JPEG, 100, out); // TODO this is lossless, may lead to very large files
