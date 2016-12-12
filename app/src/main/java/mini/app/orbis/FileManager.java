@@ -61,7 +61,6 @@ public class FileManager {
         updateFolderFiles(context);
         for(int i=count;i<getReferencedFiles(context).length;i++) {
             if(Util.contains(indices, i)) {
-                Log.d("Orbis", "References to " + i + " should be removed");
                 removeReferences(context, getReferencedFiles(context)[i]);
             }
             count++;
@@ -96,7 +95,6 @@ public class FileManager {
         File[] combined = new File[referenced.length + orbisFolder.length];
         System.arraycopy(orbisFolder, 0, combined, 0, orbisFolder.length);
         System.arraycopy(referenced, 0, combined, orbisFolder.length, referenced.length);
-        Log.d("Orbis", "The length of the file array was: " + combined.length + "; thereof referenced: " + referenced.length);
         return combined;
     }
 

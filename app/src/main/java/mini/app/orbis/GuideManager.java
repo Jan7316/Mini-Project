@@ -7,10 +7,10 @@ package mini.app.orbis;
 public class GuideManager {
 
     public static Guide[] guides = {
-            new Guide("Sample Guide", R.drawable.orbis_logo, "TODO GET PATH FORMAT FROM STACKOVERFLOW"),
-            new Guide("3D Photography", R.drawable.orbis_logo, "TODO GET PATH FORMAT FROM STACKOVERFLOW"),
-            new Guide("Getting Started", R.drawable.orbis_logo, "TODO GET PATH FORMAT FROM STACKOVERFLOW"),
-            new Guide("About Orbis VR", R.drawable.orbis_logo, "TODO GET PATH FORMAT FROM STACKOVERFLOW")
+            new Guide("Sample Guide", R.drawable.orbis_logo, "file:///android_asset/guides/sample.html"),
+            new Guide("3D Photography", R.drawable.orbis_logo, "file:///android_asset/guides/sample.html"),
+            new Guide("Getting Started", R.drawable.orbis_logo, "file:///android_asset/guides/sample.html"),
+            new Guide("About Orbis VR", R.drawable.orbis_logo, "file:///android_asset/guides/sample.html")
     };
 
     static class Guide {

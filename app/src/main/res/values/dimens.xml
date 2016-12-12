@@ -45,6 +45,14 @@
     <dimen name="title_bar_bottom_margin">6dp</dimen>
     <dimen name="title_bar_elevation">5dp</dimen>
 
+    <!-- Individual guide activity -->
+    <dimen name="title_bar_text_no_button_margin">35dp</dimen> <!-- This should always be gallery_action_button_size (currently 25dp) + title_bar_text_margin_left (currently 10dp) -->
+
+    <!-- VR viewer activity -->
+    <dimen name="action_bars_padding">20dp</dimen>
+    <dimen name="vr_viewer_action_bar_icon_size">40dp</dimen>
+    <dimen name="vr_viewer_icon_distance">70dp</dimen>
+
 
     <dimen name="single_elevation">2dp</dimen>
 

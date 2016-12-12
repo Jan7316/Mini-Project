@@ -407,9 +407,8 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
     public void shareSelectedItems(View view) {
         if(getNumberOfSelectedItems() == 1) {
             Intent share = new Intent(Intent.ACTION_SEND);
-            share.setType("image/jps");
+            share.setType("image/jpg");
             int index = Util.allIndices(true, getSelectedItems())[0]; // There should be only one index
-            //share.putExtra(Intent.EXTRA_STREAM, Uri.parse(FileManager.getFiles(this)[index].getAbsolutePath())); // TODO apparently the file is empty (GMail) and the file type not supported (WhatsApp)
             share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(FileManager.getFiles(this)[index]));
             startActivity(Intent.createChooser(share, "Share Image"));
         }
