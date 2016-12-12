@@ -117,17 +117,16 @@ public class VRRenderer implements GLSurfaceView.Renderer{
     }
 
     /**
-     * Image to be displayed. Should not be inScaled
-     * @param image
+     * Sets image to be displayed. Should not be inScaled
      */
-    public void setImage(Bitmap image) {
+    /*public void setImage(Bitmap image) {
         this.image = image;
-        /*int[] textureHandleArray = new int[1];
+        int[] textureHandleArray = new int[1];
         GLES20.glGenTextures(1,textureHandleArray,0);
         glTextureDataHandle = textureHandleArray[0];
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glTextureDataHandle);*/
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glTextureDataHandle);
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
-    }
+    }*/
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
