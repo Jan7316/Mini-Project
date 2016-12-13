@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.LinkedList;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -106,6 +107,7 @@ public class VRRenderer implements GLSurfaceView.Renderer{
     private Bitmap image;
     private VRViewerProperties properties;
     private float viewWidthHeightRatio;
+    private LinkedList<Runnable> runOnDrawList;
 
     /**
      * Image to be loaded. Should not be inScaled
@@ -114,19 +116,16 @@ public class VRRenderer implements GLSurfaceView.Renderer{
     public VRRenderer(VRViewerProperties properties, Bitmap image) {
         this.image = image;
         this.properties = properties;
+        runOnDrawList = new LinkedList<>();
     }
 
     /**
      * Sets image to be displayed. Should not be inScaled
      */
-    /*public void setImage(Bitmap image) {
+    public void setImage(Bitmap image) {
         this.image = image;
-        int[] textureHandleArray = new int[1];
-        GLES20.glGenTextures(1,textureHandleArray,0);
-        glTextureDataHandle = textureHandleArray[0];
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glTextureDataHandle);
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
-    }*/
+        runOnDraw(new ImageChanger(image));
+    }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -178,6 +177,10 @@ public class VRRenderer implements GLSurfaceView.Renderer{
 
         GLES20.glUseProgram(programHandle);
 
+        while (!runOnDrawList.isEmpty()) {
+            runOnDrawList.removeFirst().run();
+        }
+
         positionHandle = GLES20.glGetAttribLocation(programHandle, "position");
         GLES20.glEnableVertexAttribArray(positionHandle);
         GLES20.glVertexAttribPointer(positionHandle, coordsPerVertex, GLES20.GL_FLOAT, false, coordsPerVertex*bytesPerFloat, vertexBuffer);
@@ -217,5 +220,25 @@ public class VRRenderer implements GLSurfaceView.Renderer{
         GLES20.glShaderSource(shader, shaderCode);
         GLES20.glCompileShader(shader);
         return shader;
+    }
+
+    private void runOnDraw (Runnable runnable) {
+        synchronized (runOnDrawList) {
+            runOnDrawList.addLast(runnable);
+        }
+    }
+
+    private class ImageChanger implements Runnable {
+        Bitmap image;
+
+        public ImageChanger(Bitmap image) {
+            this.image = image;
+        }
+
+        @Override
+        public void run() {
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, glTextureDataHandle);
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
+        }
     }
 }

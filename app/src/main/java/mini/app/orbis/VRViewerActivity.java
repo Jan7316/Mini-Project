@@ -16,7 +16,6 @@ import android.widget.RelativeLayout;
 /**
  * @author JS
  * Activity that displays a 3D image with distortion correction applied
- *
  */
 
 public class VRViewerActivity extends AppCompatActivity {// implements AsyncTaskLoadVRImage.ITaskParent {
