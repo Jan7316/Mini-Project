@@ -30,6 +30,16 @@ public class MainMenuActivity extends AppCompatActivity {
         final View logo_text = findViewById(R.id.logo_text);
         View menu = findViewById(R.id.menu);
 
+        View decorView = getWindow().getDecorView();
+        // Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+
+        if(savedInstanceState != null) {
+            logo_text.setVisibility(View.GONE);
+            return;
+        }
+
         Animation fadeIn = new AlphaAnimation(0, 1);
         fadeIn.setDuration(1000);
         fadeIn.setStartOffset(1000);
@@ -65,11 +75,6 @@ public class MainMenuActivity extends AppCompatActivity {
         logo.setAnimation(fadeIn);
         logo_text.setAnimation(logoTextAnimations);
         menu.setAnimation(fadeInMenu);
-
-        View decorView = getWindow().getDecorView();
-        // Hide the status bar.
-        int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
     }
 
     @Override

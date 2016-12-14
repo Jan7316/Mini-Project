@@ -436,6 +436,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
     private void openImageInVRViewer(int itemID) {
         Intent intent = new Intent(this, VRViewerActivity.class);
         intent.putExtra(GlobalVars.EXTRA_PATH, FileManager.getFiles(this)[itemID].getAbsolutePath());
+        intent.putExtra(GlobalVars.EXTRA_IMAGE_ID, itemID);
         Log.d("Orbis", FileManager.getFiles(this)[itemID].getAbsolutePath());
         startActivity(intent);
     }

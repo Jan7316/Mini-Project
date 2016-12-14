@@ -7,6 +7,7 @@ package mini.app.orbis;
 public class GlobalVars {
 
     public static final String EXTRA_PATH = "path";
+    public static final String EXTRA_IMAGE_ID = "imgid";
     public static final String FRAGMENT_ID = "id";
     public static final String GUIDE_ID = "gid";
     public static final String GUIDE_TITLE = "gtitle";

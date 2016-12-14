@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
@@ -18,10 +19,10 @@ import android.widget.RelativeLayout;
  * Activity that displays a 3D image with distortion correction applied
  */
 
-public class VRViewerActivity extends AppCompatActivity {// implements AsyncTaskLoadVRImage.ITaskParent {
+public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoadVRImage.ITaskParent {
     private VRViewerProperties properties;
     private VRView view;
-    //private String path;
+    private int imageID = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +31,11 @@ public class VRViewerActivity extends AppCompatActivity {// implements AsyncTask
 
         properties = new VRViewerProperties();
 
-        view = new VRView(this, BitmapFactory.decodeFile(getIntent().getStringExtra(GlobalVars.EXTRA_PATH)));
+        imageID = getIntent().getIntExtra(GlobalVars.EXTRA_IMAGE_ID, -1);
+
+        //view = new VRView(this, BitmapFactory.decodeFile(getIntent().getStringExtra(GlobalVars.EXTRA_PATH)));
+
+        view = new VRView(this, BitmapFactory.decodeResource(getResources(), R.drawable.loading_image_vr_md));
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
         layoutParams.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_MM,
@@ -52,8 +57,8 @@ public class VRViewerActivity extends AppCompatActivity {// implements AsyncTask
         findViewById(R.id.action_Bar_bottom).bringToFront();
         findViewById(R.id.container).invalidate();
 
-        //path = getIntent().getStringExtra(GlobalVars.EXTRA_PATH);
-        //new AsyncTaskLoadVRImage(this, path).execute();
+        String path = getIntent().getStringExtra(GlobalVars.EXTRA_PATH);
+        new AsyncTaskLoadVRImage(this, path).execute();
 
         View decorView = getWindow().getDecorView();
         // Hide the status bar.
@@ -65,11 +70,11 @@ public class VRViewerActivity extends AppCompatActivity {// implements AsyncTask
         findViewById(R.id.space).setVisibility(View.GONE);
     }
 
-    /*@Override
+    @Override
     public void onImagesLoaded(Bitmap image) {
         view.setImage(image);
-<<<<<<< HEAD
-    }*/
+        isLoading = false;
+    }
 
     boolean actionBarsVisible = false;
 
@@ -122,5 +127,26 @@ public class VRViewerActivity extends AppCompatActivity {// implements AsyncTask
 
     public void goBack(View view) {
         finish();
+    }
+
+    public void goLeft(View view) {
+        if(imageID <= 0)
+            return;
+        loadImage(imageID - 1);
+    }
+
+    public void goRight(View view) {
+        if(imageID >= (FileManager.getFiles(this).length - 1))
+            return;
+        loadImage(imageID + 1);
+    }
+
+    boolean isLoading;
+    private void loadImage(int id) {
+        if(isLoading)
+            return; // Wait for the previous image to finish loading
+        isLoading = true;
+        imageID = id;
+        new AsyncTaskLoadVRImage(this, FileManager.getFiles(this)[id].getAbsolutePath()).execute();
     }
 }
