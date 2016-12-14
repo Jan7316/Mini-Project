@@ -18,10 +18,10 @@ import android.widget.RelativeLayout;
  * Activity that displays a 3D image with distortion correction applied
  */
 
-public class VRViewerActivity extends AppCompatActivity {// implements AsyncTaskLoadVRImage.ITaskParent {
+public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoadVRImage.ITaskParent {
     private VRViewerProperties properties;
     private VRView view;
-    //private String path;
+    private String path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +30,7 @@ public class VRViewerActivity extends AppCompatActivity {// implements AsyncTask
 
         properties = new VRViewerProperties();
 
-        view = new VRView(this, BitmapFactory.decodeFile(getIntent().getStringExtra(GlobalVars.EXTRA_PATH)));
+        view = new VRView(this, BitmapFactory.decodeResource(getResources(), R.drawable.ic_loading_image));
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
         layoutParams.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_MM,
@@ -52,8 +52,8 @@ public class VRViewerActivity extends AppCompatActivity {// implements AsyncTask
         findViewById(R.id.action_Bar_bottom).bringToFront();
         findViewById(R.id.container).invalidate();
 
-        //path = getIntent().getStringExtra(GlobalVars.EXTRA_PATH);
-        //new AsyncTaskLoadVRImage(this, path).execute();
+        path = getIntent().getStringExtra(GlobalVars.EXTRA_PATH);
+        new AsyncTaskLoadVRImage(this, path).execute();
 
         View decorView = getWindow().getDecorView();
         // Hide the status bar.
@@ -65,11 +65,10 @@ public class VRViewerActivity extends AppCompatActivity {// implements AsyncTask
         findViewById(R.id.space).setVisibility(View.GONE);
     }
 
-    /*@Override
+    @Override
     public void onImagesLoaded(Bitmap image) {
         view.setImage(image);
-<<<<<<< HEAD
-    }*/
+    }
 
     boolean actionBarsVisible = false;
 
