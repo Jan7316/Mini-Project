@@ -36,8 +36,6 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
 
         imageID = getIntent().getIntExtra(GlobalVars.EXTRA_IMAGE_ID, -1);
 
-        //view = new VRView(this, BitmapFactory.decodeFile(getIntent().getStringExtra(GlobalVars.EXTRA_PATH)));
-
         view = new VRView(this, BitmapFactory.decodeResource(getResources(), R.drawable.loading_image_vr_md));
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
