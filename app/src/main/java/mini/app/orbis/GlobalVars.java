@@ -14,6 +14,7 @@ public class GlobalVars {
     public static final String GUIDE_IMAGE = "gimage";
 
     public static final String FILE_REFERENCES_PREFERENCE_FILE = "filerefs";
+    public static final String SETTINGS_PREFERENCE_FILE = "settings";
 
     public static final int REQUEST_CODE_FILE_PERMISSION = 1;
 

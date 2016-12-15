@@ -50,7 +50,8 @@
 
     <!-- VR viewer activity -->
     <dimen name="action_bars_padding">20dp</dimen>
-    <dimen name="vr_viewer_action_bar_icon_size">40dp</dimen>
+    <dimen name="vr_viewer_action_bar_icon_top_size">35dp</dimen>
+    <dimen name="vr_viewer_action_bar_icon_bottom_size">40dp</dimen>
     <dimen name="vr_viewer_icon_distance">70dp</dimen>
 
 

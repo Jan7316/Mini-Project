@@ -1,9 +1,11 @@
 package mini.app.orbis;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 /**
  * @author JS
@@ -68,18 +71,24 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
         findViewById(R.id.action_Bar_top).setVisibility(View.GONE);
         findViewById(R.id.action_Bar_bottom).setVisibility(View.GONE);
         findViewById(R.id.space).setVisibility(View.GONE);
+
+        FontManager.applyFontToView(this, (TextView) findViewById(R.id.title), FontManager.Font.lato);
     }
 
     @Override
     public void onImagesLoaded(Bitmap image) {
         view.setImage(image);
         isLoading = false;
+        ((TextView) findViewById(R.id.title)).setText(FileManager.getFiles(this)[imageID].getName());
     }
 
     boolean actionBarsVisible = false;
 
     public void onContainerLongClick(View view) {
-        if(!actionBarsVisible) {
+        if(isDiashowRunning) {
+            stopDiashow();
+            showActionBars();
+        } else if(!actionBarsVisible) {
             showActionBars();
         }
     }
@@ -148,5 +157,98 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
         isLoading = true;
         imageID = id;
         new AsyncTaskLoadVRImage(this, FileManager.getFiles(this)[id].getAbsolutePath()).execute();
+    }
+
+    private Handler handler;
+    private int numberIterated;
+    private boolean isDiashowRunning = false;
+    public void startDiashow(View view) {
+        numberIterated = 0;
+        handler = new Handler();
+        isDiashowRunning = true;
+        hideActionBars();
+        handler.postDelayed(diashowStepRunnable(), OrbisSettings.getIntSetting(this, OrbisSettings.OrbisSetting.diashowStartDelay) * 1000);
+    }
+
+    private void iterateDiashow() {
+        numberIterated++;
+        Log.d("Orbis", "Number of iterations: " + numberIterated);
+        switch(OrbisSettings.getIntSetting(this, OrbisSettings.OrbisSetting.diashowMode)) {
+            case 0:
+                if(numberIterated >= OrbisSettings.getIntSetting(this, OrbisSettings.OrbisSetting.diashowNumberOfImages)) {
+                    handler.postDelayed(showActionBarsRunnable(), OrbisSettings.getIntSetting(this, OrbisSettings.OrbisSetting.diashowTPI) * 1000);
+                    return;
+                }
+                break;
+            case 1:
+                if(OrbisSettings.getBoolSetting(this, OrbisSettings.OrbisSetting.diashowDirection)) {
+                    if(imageID == FileManager.getFiles(this).length - 1) {
+                        handler.postDelayed(showActionBarsRunnable(), OrbisSettings.getIntSetting(this, OrbisSettings.OrbisSetting.diashowTPI) * 1000);
+                        return;
+                    }
+                } else {
+                    if(imageID == 0) {
+                        handler.postDelayed(showActionBarsRunnable(), OrbisSettings.getIntSetting(this, OrbisSettings.OrbisSetting.diashowTPI) * 1000);
+                        return;
+                    }
+                }
+                break;
+        }
+        handler.postDelayed(diashowStepRunnable(), OrbisSettings.getIntSetting(this, OrbisSettings.OrbisSetting.diashowTPI) * 1000);
+    }
+
+    private Runnable showActionBarsRunnable() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                showActionBars();
+                stopDiashow();
+            }
+        };
+    }
+
+    /**
+      * NOTE: this method should not be called if the diashow is supposed to end; this will always loop over the end of the file array
+      */
+    private Runnable diashowStepRunnable() {
+        Log.d("Orbis", "Diashow has progressed");
+        return new Runnable() {
+            @Override
+            public void run() {
+                int nextImgID;
+                if(OrbisSettings.getBoolSetting(getContext(), OrbisSettings.OrbisSetting.diashowDirection)) {
+                    if(imageID >= (FileManager.getFiles(getContext()).length) - 1) {
+                        nextImgID = 0;
+                    } else {
+                        nextImgID = imageID + 1;
+                    }
+                } else {
+                    if(imageID <= 0) {
+                        nextImgID = FileManager.getFiles(getContext()).length - 1;
+                    } else {
+                        nextImgID = imageID - 1;
+                    }
+                }
+                loadImage(nextImgID);
+                iterateDiashow();
+            }
+        };
+    }
+
+    public Context getContext() {
+        return this;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(isDiashowRunning)
+            stopDiashow();
+    }
+
+    public void stopDiashow() {
+        Log.d("Orbis", "Diashow has been stopped");
+        handler.removeCallbacksAndMessages(null);
+        isDiashowRunning = false;
     }
 }

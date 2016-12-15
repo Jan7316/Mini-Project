@@ -11,19 +11,51 @@
         android:orientation="vertical"
         android:id="@+id/action_Bar_top">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:padding="@dimen/action_bars_padding">
-            <ImageView
-                android:layout_width="@dimen/vr_viewer_action_bar_icon_size"
-                android:layout_height="@dimen/vr_viewer_action_bar_icon_size"
-                android:src="@drawable/ic_arrow_back_white_24dp"
-                android:clickable="true"
-                android:onClick="goBack"
-                android:background="?attr/selectableItemBackgroundBorderless"/>
-        </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true">
+                <ImageView
+                    android:layout_width="@dimen/vr_viewer_action_bar_icon_top_size"
+                    android:layout_height="@dimen/vr_viewer_action_bar_icon_top_size"
+                    android:src="@drawable/ic_arrow_back_white_24dp"
+                    android:clickable="true"
+                    android:onClick="goBack"
+                    android:background="?attr/selectableItemBackgroundBorderless"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorTitle"
+                    android:textSize="@dimen/title_bar_text_size"
+                    android:id="@+id/title"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true">
+                <ImageView
+                    android:layout_width="@dimen/vr_viewer_action_bar_icon_top_size"
+                    android:layout_height="@dimen/vr_viewer_action_bar_icon_top_size"
+                    android:src="@drawable/ic_diashow_temp"
+                    android:clickable="true"
+                    android:onClick="startDiashow"
+                    android:background="?attr/selectableItemBackgroundBorderless"/>
+            </LinearLayout>
+        </RelativeLayout>
 
         <Space
             android:layout_width="match_parent"
@@ -41,8 +73,8 @@
             android:id="@+id/action_Bar_bottom"
             android:padding="@dimen/action_bars_padding">
             <ImageView
-                android:layout_width="@dimen/vr_viewer_action_bar_icon_size"
-                android:layout_height="@dimen/vr_viewer_action_bar_icon_size"
+                android:layout_width="@dimen/vr_viewer_action_bar_icon_bottom_size"
+                android:layout_height="@dimen/vr_viewer_action_bar_icon_bottom_size"
                 android:src="@drawable/ic_chevron_left_white_24dp"
                 android:layout_marginRight="@dimen/vr_viewer_icon_distance"
                 android:clickable="true"
@@ -50,8 +82,8 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:id="@+id/goLeft"/>
             <ImageView
-                android:layout_width="@dimen/vr_viewer_action_bar_icon_size"
-                android:layout_height="@dimen/vr_viewer_action_bar_icon_size"
+                android:layout_width="@dimen/vr_viewer_action_bar_icon_bottom_size"
+                android:layout_height="@dimen/vr_viewer_action_bar_icon_bottom_size"
                 android:src="@drawable/ic_chevron_right_white_24dp"
                 android:clickable="true"
                 android:onClick="goRight"
