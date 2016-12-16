@@ -22,4 +22,11 @@
     <!-- Guides menu -->
     <string name="guides_menu_title">Orbis Guides</string>
 
+    <!-- VR viewer -->
+    <string name="diashow_started">Diashow started</string>
+    <string name="diashow_ended">Diashow stopped</string>
+
+    <!-- Diashow settings -->
+    <string name="diashow_settings_title">Diashow Settings</string>
+
 </resources>

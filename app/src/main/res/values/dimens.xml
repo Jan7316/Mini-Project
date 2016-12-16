@@ -54,6 +54,9 @@
     <dimen name="vr_viewer_action_bar_icon_bottom_size">40dp</dimen>
     <dimen name="vr_viewer_icon_distance">70dp</dimen>
 
+    <!-- Diashow settings activity -->
+    <dimen name="settings_content_margin_top">30dp</dimen>
+
 
     <dimen name="single_elevation">2dp</dimen>
 

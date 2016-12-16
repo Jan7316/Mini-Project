@@ -9,12 +9,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:id="@+id/action_Bar_top">
+        android:id="@+id/menu_container">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/action_bars_padding">
+            android:padding="@dimen/action_bars_padding"
+            android:id="@+id/action_Bar_top">
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -70,8 +71,8 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_horizontal"
-            android:id="@+id/action_Bar_bottom"
-            android:padding="@dimen/action_bars_padding">
+            android:paddingBottom="@dimen/action_bars_padding"
+            android:id="@+id/action_Bar_bottom">
             <ImageView
                 android:layout_width="@dimen/vr_viewer_action_bar_icon_bottom_size"
                 android:layout_height="@dimen/vr_viewer_action_bar_icon_bottom_size"
@@ -90,6 +91,26 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:id="@+id/goRight"/>
         </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/vr_viewer_action_bar_icon_top_size"
+        android:orientation="horizontal"
+        android:id="@+id/diashow_notification_container"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="65dp"
+        android:layout_marginTop="@dimen/action_bars_padding"
+        android:gravity="center_vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorTitle"
+            android:id="@+id/diashow_notification"
+            android:fontFamily="monospace"
+            android:text="Diashow started"/>
     </LinearLayout>
 
 </RelativeLayout>

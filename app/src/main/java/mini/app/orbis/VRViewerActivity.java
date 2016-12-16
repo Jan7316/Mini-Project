@@ -12,10 +12,15 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.google.android.gms.vision.text.Text;
 
 /**
  * @author JS
@@ -53,9 +58,8 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
             }
         });
 
-        findViewById(R.id.action_Bar_top).bringToFront();
-        findViewById(R.id.space).bringToFront();
-        findViewById(R.id.action_Bar_bottom).bringToFront();
+        findViewById(R.id.diashow_notification_container).bringToFront();
+        findViewById(R.id.menu_container).bringToFront();
         findViewById(R.id.container).invalidate();
 
         String path = getIntent().getStringExtra(GlobalVars.EXTRA_PATH);
@@ -69,6 +73,7 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
         findViewById(R.id.action_Bar_top).setVisibility(View.GONE);
         findViewById(R.id.action_Bar_bottom).setVisibility(View.GONE);
         findViewById(R.id.space).setVisibility(View.GONE);
+        findViewById(R.id.diashow_notification_container).setVisibility(View.GONE);
 
         FontManager.applyFontToView(this, (TextView) findViewById(R.id.title), FontManager.Font.lato);
     }
@@ -119,8 +124,13 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
     }
 
     private void fadeOutView(View view) {
+        fadeOutView(view, 0);
+    }
+
+    private void fadeOutView(View view, int delay) {
         Animation fadeOut = new AlphaAnimation(1, 0);
         fadeOut.setDuration(ANIMATION_DURATION);
+        fadeOut.setStartOffset(delay);
         final View icon = view;
         fadeOut.setAnimationListener(new Animation.AnimationListener(){
             public void onAnimationStart(Animation anim) {}
@@ -132,19 +142,50 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
         icon.startAnimation(fadeOut);
     }
 
+    private void fadeInAndOutView(View view) {
+        Animation fadeIn = new AlphaAnimation(0, 1);
+        fadeIn.setInterpolator(new DecelerateInterpolator());
+        fadeIn.setDuration(ANIMATION_DURATION);
+
+        Animation fadeOut = new AlphaAnimation(1, 0);
+        fadeOut.setInterpolator(new AccelerateInterpolator());
+        fadeOut.setStartOffset(FADE_OUT_DELAY);
+        fadeOut.setDuration(ANIMATION_DURATION);
+        final View icon = view;
+        fadeOut.setAnimationListener(new Animation.AnimationListener(){
+            public void onAnimationStart(Animation anim) {}
+            public void onAnimationRepeat(Animation anim) {}
+            public void onAnimationEnd(Animation anim) {
+                icon.setVisibility(View.GONE);
+                Log.d("Orbis", "Fade out complete");
+            }
+        });
+
+        AnimationSet animation = new AnimationSet(false);
+        animation.addAnimation(fadeIn);
+        animation.addAnimation(fadeOut);
+        view.setAnimation(animation);
+        view.setVisibility(View.VISIBLE);
+        Log.d("Orbis", "Fade in started");
+    }
+
     public void goBack(View view) {
         finish();
     }
 
     public void goLeft(View view) {
-        if(imageID <= 0)
+        if(imageID <= 0) {
+            loadImage(FileManager.getFiles(this).length - 1);
             return;
+        }
         loadImage(imageID - 1);
     }
 
     public void goRight(View view) {
-        if(imageID >= (FileManager.getFiles(this).length - 1))
+        if(imageID >= (FileManager.getFiles(this).length - 1)) {
+            loadImage(0);
             return;
+        }
         loadImage(imageID + 1);
     }
 
@@ -166,6 +207,7 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
         isDiashowRunning = true;
         hideActionBars();
         handler.postDelayed(diashowStepRunnable(), OrbisSettings.getIntSetting(this, OrbisSettings.OrbisSetting.diashowStartDelay) * 1000);
+        showDiashowStartedNotification();
     }
 
     private void iterateDiashow() {
@@ -248,5 +290,19 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
         Log.d("Orbis", "Diashow has been stopped");
         handler.removeCallbacksAndMessages(null);
         isDiashowRunning = false;
+        showDiashowEndedNotification();
+    }
+
+    private final int FADE_OUT_DELAY = 2000;
+    private void showDiashowStartedNotification() {
+        TextView diashowNotification = (TextView) findViewById(R.id.diashow_notification);
+        diashowNotification.setText(getString(R.string.diashow_started));
+        fadeInAndOutView(findViewById(R.id.diashow_notification_container));
+    }
+
+    private void showDiashowEndedNotification() {
+        TextView diashowNotification = (TextView) findViewById(R.id.diashow_notification);
+        diashowNotification.setText(getString(R.string.diashow_ended));
+        fadeInAndOutView(findViewById(R.id.diashow_notification_container));
     }
 }
