@@ -1,13 +1,14 @@
 package mini.app.orbis;
 
-import android.*;
 import android.Manifest;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,7 +20,18 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
 
-public class MainMenuActivity extends AppCompatActivity {
+import java.util.Date;
+
+import mini.app.orbis.util.IabHelper;
+import mini.app.orbis.util.IabResult;
+import mini.app.orbis.util.Inventory;
+import mini.app.orbis.util.Purchase;
+
+public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnIabPurchaseFinishedListener {
+
+    IabHelper mHelper;
+
+    boolean active; // true if the app is allowed to be used
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +49,8 @@ public class MainMenuActivity extends AppCompatActivity {
 
         if(savedInstanceState != null) {
             logo_text.setVisibility(View.GONE);
+
+            initializeIAB();
             return;
         }
 
@@ -75,6 +89,58 @@ public class MainMenuActivity extends AppCompatActivity {
         logo.setAnimation(fadeIn);
         logo_text.setAnimation(logoTextAnimations);
         menu.setAnimation(fadeInMenu);
+
+        initializeIAB();
+    }
+
+    private void initializeIAB() {
+        // FROM https://developer.android.com/training/in-app-billing/preparing-iab-app.html
+        String base64EncodedPublicKey = ""; // This should be compiled at runtime from separate strings
+
+        // compute your public key and store it in base64EncodedPublicKey
+        mHelper = new IabHelper(this, base64EncodedPublicKey);
+
+        mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+            public void onIabSetupFinished(IabResult result) {
+                if (!result.isSuccess()) {
+                    // Oh no, there was a problem.
+                    Log.d("Orbis", "Problem setting up In-app Billing: " + result);
+                }
+                // Hooray, IAB is fully set up!
+            }
+        });
+
+        SharedPreferences usageStats = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
+        long firstUsage = usageStats.getLong(GlobalVars.KEY_FIRST_USAGE, new Date().getTime());
+        Log.d("Orbis", "First usage was " + firstUsage);
+        long today = new Date().getTime();
+        long trialPeriod = 1000 * 60 * 60 * 24 * 7;
+        if(today > firstUsage + trialPeriod) {
+            active = false;
+            Log.d("Orbis", "The trial period has elapsed: " + (today - firstUsage) + " ms");
+            try {
+                mHelper.queryInventoryAsync(new IabHelper.QueryInventoryFinishedListener() {
+                    public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+                        if (result.isFailure()) {
+                            // handle error here
+                        }
+                        else {
+                            active = inventory.hasPurchase(GlobalVars.SKU_PREMIUM);
+                            Log.d("Orbis", "Purchase status: " + active);
+                        }
+                    }
+                });
+            } catch(IabHelper.IabAsyncInProgressException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.d("Orbis", "The trial period has not yet elapsed: " + (today - firstUsage) + " ms");
+            active = true;
+            SharedPreferences sharedPref = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putLong(GlobalVars.KEY_FIRST_USAGE, firstUsage);
+            editor.apply();
+        }
     }
 
     @Override
@@ -93,14 +159,22 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
     public void toGallery(View view) {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    GlobalVars.REQUEST_CODE_FILE_PERMISSION);
+        if(active) {
+            if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        GlobalVars.REQUEST_CODE_FILE_PERMISSION);
+            } else {
+                Intent intent = new Intent(this, GalleryActivity.class);
+                startActivity(intent);
+            }
         } else {
-            Intent intent = new Intent(this, GalleryActivity.class);
-            startActivity(intent);
+            try {
+                mHelper.launchPurchaseFlow(this, GlobalVars.SKU_PREMIUM, 10001, this, "PURCHASE VERIFIER - TODO");
+            } catch(IabHelper.IabAsyncInProgressException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -130,6 +204,37 @@ public class MainMenuActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    public void onIabPurchaseFinished(IabResult result, Purchase purchase)
+    {
+        if (result.isFailure()) {
+            Log.d("Orbis", "Error purchasing: " + result);
+        } else if (purchase.getSku().equals(GlobalVars.SKU_PREMIUM)) {
+            active = true;
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setTitle("Thank You")
+                    .setMessage("You have successfully unlocked Orbis VR for unlimited usage.")
+                    .setNeutralButton("Enjoy!", null).create();
+            dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+            dialog.show();
+            dialog.getWindow().getDecorView().setSystemUiVisibility(
+                    this.getWindow().getDecorView().getSystemUiVisibility());
+            dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mHelper != null)
+            try {
+                mHelper.dispose();
+            } catch(IabHelper.IabAsyncInProgressException e) {
+                e.printStackTrace();
+            }
+        mHelper = null;
     }
 
 }

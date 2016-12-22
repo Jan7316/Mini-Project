@@ -101,7 +101,7 @@
         android:id="@+id/diashow_notification_container"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="65dp"
+        android:layout_marginRight="@dimen/vr_viewer_diashow_notification_margin_right"
         android:layout_marginTop="@dimen/action_bars_padding"
         android:gravity="center_vertical">
         <TextView

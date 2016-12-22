@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
@@ -179,7 +180,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
                 layoutParams.columnSpec = GridLayout.spec(3);
                 layoutParams.rowSpec = GridLayout.spec(i);
                 space.setLayoutParams(layoutParams);
-                ((GridLayout) findViewById(R.id.gallery_container)).addView(space);
+                ((android.support.v7.widget.GridLayout) findViewById(R.id.gallery_container)).addView(space);
             }
             alreadyInitializedSpaces = true;
         }
@@ -223,9 +224,10 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
             }
             if(fragmentView == null) // Presumably the fragment has not yet been inflated
                 return;
-            GridLayout.LayoutParams layoutParams = (GridLayout.LayoutParams) fragmentView.getLayoutParams();
-            layoutParams.rowSpec = GridLayout.spec(cellID / columnCount());
-            layoutParams.columnSpec = GridLayout.spec(cellID % columnCount());
+            android.support.v7.widget.GridLayout.LayoutParams layoutParams = (android.support.v7.widget.GridLayout.LayoutParams) fragmentView.getLayoutParams();
+            layoutParams.rowSpec = android.support.v7.widget.GridLayout.spec(cellID / columnCount(), 1, android.support.v7.widget.GridLayout.BASELINE, 1);
+            layoutParams.columnSpec = android.support.v7.widget.GridLayout.spec(cellID % columnCount(), 1, android.support.v7.widget.GridLayout.START, 1);
+            layoutParams.setGravity(Gravity.FILL);
 
             fragmentView.setLayoutParams(layoutParams);
         }

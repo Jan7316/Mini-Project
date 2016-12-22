@@ -15,6 +15,9 @@ public class GlobalVars {
 
     public static final String FILE_REFERENCES_PREFERENCE_FILE = "filerefs";
     public static final String SETTINGS_PREFERENCE_FILE = "settings";
+    public static final String USAGE_STATS_PREFERENCE_FILE = "usage";
+
+    public static final String KEY_FIRST_USAGE = "firstusage";
 
     public static final int REQUEST_CODE_FILE_PERMISSION = 1;
 
@@ -26,4 +29,7 @@ public class GlobalVars {
 
     public static final String SAVE_FILE_FORMAT = "jpg";
     public static final String[] ACCEPTED_FILE_FORMATS = {"jps", "jpeg", "jpg"};
+
+
+    public static final String SKU_PREMIUM = "android.test.purchased"; // TODO URGENT
 }

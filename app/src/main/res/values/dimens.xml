@@ -9,7 +9,7 @@
     <dimen name="menu_logo_text_height">150dp</dimen>
     <dimen name="menu_welcome_height">100dp</dimen>
     <dimen name="menu_margin_right">75dp</dimen>
-    <dimen name="menu_vertical_spacing">50dp</dimen>
+    <dimen name="menu_vertical_spacing">40dp</dimen>
 
     <dimen name="text_size_welcome">30dp</dimen>
     <dimen name="menu_icon_size">100dp</dimen>
@@ -53,6 +53,7 @@
     <dimen name="vr_viewer_action_bar_icon_top_size">35dp</dimen>
     <dimen name="vr_viewer_action_bar_icon_bottom_size">40dp</dimen>
     <dimen name="vr_viewer_icon_distance">70dp</dimen>
+    <dimen name="vr_viewer_diashow_notification_margin_right">65dp</dimen> <!-- vr_viewer_action_bar_icon_top_size + action_bars_padding + 10dp -->
 
     <!-- Diashow settings activity -->
     <dimen name="settings_content_margin_top">30dp</dimen>

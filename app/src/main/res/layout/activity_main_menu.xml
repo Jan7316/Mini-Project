@@ -61,19 +61,28 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:gravity="center">
 
-                <Button
+                <ImageView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Guides"
-                    android:onClick="toGuides"/>
+                    android:layout_height="50dp"
+                    android:src="@drawable/ic_guides"
+                    android:clickable="true"
+                    android:onClick="toGuides"
+                    android:scaleType="fitStart"
+                    android:adjustViewBounds="true"
+                    android:padding="10dp"/>
 
-                <Button
+                <ImageView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Gallery and Camera"
-                    android:onClick="toGallery"/>
+                    android:layout_height="50dp"
+                    android:src="@drawable/ic_gallery_camera"
+                    android:clickable="true"
+                    android:onClick="toGallery"
+                    android:scaleType="fitStart"
+                    android:adjustViewBounds="true"
+                    android:padding="10dp"/>
 
             </LinearLayout>
 

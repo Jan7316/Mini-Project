@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_welcome_to_orbis_3"
+        android:scaleType="fitStart"
+        android:adjustViewBounds="true"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25dp"
+        android:layout_marginTop="20dp"
+        android:text="Please choose one the following options"
+        android:id="@+id/choice"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="60dp"
+        android:clipToPadding="false">
+        <Button
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="I have bought an Orbis VR headset"
+            android:background="@null"
+            android:elevation="2dp"
+            android:layout_marginRight="40dp"
+            android:textSize="20dp"
+            android:textAllCaps="false"
+            android:id="@+id/bought"/>
+        <Button
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="I only want to use the app"
+            android:background="@null"
+            android:elevation="2dp"
+            android:textSize="20dp"
+            android:textAllCaps="false"
+            android:id="@+id/app_only"/>
+    </LinearLayout>
+
+</LinearLayout>

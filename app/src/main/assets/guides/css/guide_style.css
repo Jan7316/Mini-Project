@@ -21,8 +21,21 @@
 * {
     font-weight: 300;
     font-family: 'Lato';
+    text-align: justify;
 }
 
 .full-width {
     width: 100%;
+}
+
+.right {
+    width: 48%;
+    float: right;
+    padding: 2%;
+}
+
+.left {
+    width: 48%;
+    float: left;
+    padding: 2%;
 }
