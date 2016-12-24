@@ -94,7 +94,13 @@ public class ImportActivity extends AppCompatActivity {
     }
 
     public void startImageCapture(View view) {
-        takePicture(false);
+        //takePicture(false);
+        String leftOutputPath = Environment.getExternalStorageDirectory().toString() + "/Orbis/.temp/latest_capture_left.jpg";
+        String rightOutputPath = Environment.getExternalStorageDirectory().toString() + "/Orbis/.temp/latest_capture_right.jpg";
+        Intent stereoCameraIntent = new Intent(this, StereoCameraActivity.class);
+        stereoCameraIntent.putExtra(GlobalVars.EXTRA_LEFT_OUTPUT, leftOutputPath);
+        stereoCameraIntent.putExtra(GlobalVars.EXTRA_RIGHT_OUTPUT, rightOutputPath);
+        startActivityForResult(stereoCameraIntent, GlobalVars.INTENT_CAPTURE_STEREO);
     }
 
     /**
@@ -102,14 +108,14 @@ public class ImportActivity extends AppCompatActivity {
      * false: left
      * true: right
      */
-    private void takePicture(boolean side) {
+    /*private void takePicture(boolean side) {
         String pictureImagePath =  Environment.getExternalStorageDirectory().toString() + "/Orbis/.temp/latest_capture_" + (side ? "right" : "left") + ".jpg";
         File file = new File(pictureImagePath);
         Uri outputFileUri = Uri.fromFile(file);
         Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
         startActivityForResult(cameraIntent, (side ? GlobalVars.INTENT_CAPTURE_RIGHT : GlobalVars.INTENT_CAPTURE_LEFT));
-    }
+    }*/
 
     public void combineImages(View view) {
         Intent intent = new Intent(this, CombineImagesActivity.class);
@@ -118,7 +124,49 @@ public class ImportActivity extends AppCompatActivity {
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch(requestCode) {
-            case GlobalVars.INTENT_CAPTURE_LEFT:
+            case GlobalVars.INTENT_CAPTURE_STEREO:
+                if (resultCode != RESULT_OK) {
+                    break; // TODO image capture failed/was cancelled
+                }
+                String orbisTempPath = Environment.getExternalStorageDirectory().toString() + "/Orbis/.temp";
+                String basePath = orbisTempPath + "/latest_capture_";
+                String pathLeft = basePath + "left.jpg";
+                String pathRight = basePath + "right.jpg";
+                File left = new  File(pathLeft);
+                File right = new  File(pathRight);
+                if(left.exists() && right.exists()){
+                    Bitmap leftBitmap = BitmapFactory.decodeFile(left.getAbsolutePath());
+                    Bitmap rightBitmap = BitmapFactory.decodeFile(right.getAbsolutePath());
+                    Bitmap combined = combineImages(leftBitmap, rightBitmap);
+
+                    FileOutputStream out = null;
+                    String resultFileName = orbisTempPath + "/new_capture.jps";
+                    try {
+                        out = new FileOutputStream(resultFileName);
+                        combined.compress(Bitmap.CompressFormat.JPEG, 100, out); // TODO this is lossless, may lead to very large files
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if (out != null) {
+                                out.close();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    left.delete();
+                    right.delete();
+                    //new File(storageDir.getAbsolutePath() + "/Orbis/.temp").delete(); // delete the temporary folder (does not work at the moment, an empty folder remains)
+                    // shouldn't be deleted at this point as ViewCaptureActivity will load the temporarily stored image from this folder
+
+                    Intent intent = new Intent(this, ViewCaptureActivity.class);
+                    intent.putExtra(GlobalVars.EXTRA_PATH, resultFileName);
+                    startActivityForResult(intent, GlobalVars.INTENT_FINISH_PARENT);
+                }
+                break;
+            /*case GlobalVars.INTENT_CAPTURE_LEFT:
                 if(resultCode == RESULT_OK) {
                     takePicture(true);
                 } else {
@@ -166,7 +214,7 @@ public class ImportActivity extends AppCompatActivity {
                     intent.putExtra(GlobalVars.EXTRA_PATH, resultFileName);
                     startActivityForResult(intent, GlobalVars.INTENT_FINISH_PARENT);
                 }
-                break;
+                break;*/
             case GlobalVars.INTENT_FINISH_PARENT: // TODO this does not work yet
                 if(resultCode == GlobalVars.RESULT_FINISH_PARENT) {
                     finish();

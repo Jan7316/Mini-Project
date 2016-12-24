@@ -12,6 +12,8 @@ public class GlobalVars {
     public static final String GUIDE_ID = "gid";
     public static final String GUIDE_TITLE = "gtitle";
     public static final String GUIDE_IMAGE = "gimage";
+    public static final String EXTRA_LEFT_OUTPUT = "leftOutputUri";
+    public static final String EXTRA_RIGHT_OUTPUT = "rightOutputUri";
 
     public static final String FILE_REFERENCES_PREFERENCE_FILE = "filerefs";
     public static final String SETTINGS_PREFERENCE_FILE = "settings";
@@ -23,6 +25,7 @@ public class GlobalVars {
 
     public static final int INTENT_CAPTURE_LEFT = 1;
     public static final int INTENT_CAPTURE_RIGHT = 2;
+    public static final int INTENT_CAPTURE_STEREO = 4;
     public static final int INTENT_FINISH_PARENT = 3;
 
     public static final int RESULT_FINISH_PARENT = 1;
