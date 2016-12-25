@@ -95,11 +95,13 @@ public class ImportActivity extends AppCompatActivity {
 
     public void startImageCapture(View view) {
         //takePicture(false);
-        String leftOutputPath = Environment.getExternalStorageDirectory().toString() + "/Orbis/.temp/latest_capture_left.jpg";
-        String rightOutputPath = Environment.getExternalStorageDirectory().toString() + "/Orbis/.temp/latest_capture_right.jpg";
+        String leftOutputPath = Environment.getExternalStorageDirectory().toString() + "/Orbis/latest_capture_left.jpg"; //TODO: Add .temp back
+        String rightOutputPath = Environment.getExternalStorageDirectory().toString() + "/Orbis/latest_capture_right.jpg";
+        File leftFile = new File(leftOutputPath);
+        File rightFile = new File(rightOutputPath);
         Intent stereoCameraIntent = new Intent(this, StereoCameraActivity.class);
-        stereoCameraIntent.putExtra(GlobalVars.EXTRA_LEFT_OUTPUT, leftOutputPath);
-        stereoCameraIntent.putExtra(GlobalVars.EXTRA_RIGHT_OUTPUT, rightOutputPath);
+        stereoCameraIntent.putExtra(GlobalVars.EXTRA_LEFT_OUTPUT, Uri.fromFile(leftFile));
+        stereoCameraIntent.putExtra(GlobalVars.EXTRA_RIGHT_OUTPUT, Uri.fromFile(rightFile));
         startActivityForResult(stereoCameraIntent, GlobalVars.INTENT_CAPTURE_STEREO);
     }
 
@@ -128,8 +130,8 @@ public class ImportActivity extends AppCompatActivity {
                 if (resultCode != RESULT_OK) {
                     break; // TODO image capture failed/was cancelled
                 }
-                String orbisTempPath = Environment.getExternalStorageDirectory().toString() + "/Orbis/.temp";
-                String basePath = orbisTempPath + "/latest_capture_";
+                String orbisPath = Environment.getExternalStorageDirectory().toString() + "/Orbis";
+                String basePath = orbisPath + "/latest_capture_"; // TODO: Add .temp back
                 String pathLeft = basePath + "left.jpg";
                 String pathRight = basePath + "right.jpg";
                 File left = new  File(pathLeft);
@@ -139,10 +141,16 @@ public class ImportActivity extends AppCompatActivity {
                     Bitmap rightBitmap = BitmapFactory.decodeFile(right.getAbsolutePath());
                     Bitmap combined = combineImages(leftBitmap, rightBitmap);
 
+                    int imageNum = 0; // TODO: Save current image number indstead of loopig through all possibilities every time
+                    File file = new File(orbisPath + "/OrbisImage_"+imageNum+".jps");
+                    while(file.exists()) {
+                        imageNum ++;
+                        file = new File(orbisPath + "/OrbisImage_"+imageNum+".jps");
+                    }
+
                     FileOutputStream out = null;
-                    String resultFileName = orbisTempPath + "/new_capture.jps";
                     try {
-                        out = new FileOutputStream(resultFileName);
+                        out = new FileOutputStream(file);
                         combined.compress(Bitmap.CompressFormat.JPEG, 100, out); // TODO this is lossless, may lead to very large files
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -158,12 +166,13 @@ public class ImportActivity extends AppCompatActivity {
 
                     left.delete();
                     right.delete();
+                    FileManager.updateFolderFiles(this);
                     //new File(storageDir.getAbsolutePath() + "/Orbis/.temp").delete(); // delete the temporary folder (does not work at the moment, an empty folder remains)
                     // shouldn't be deleted at this point as ViewCaptureActivity will load the temporarily stored image from this folder
 
-                    Intent intent = new Intent(this, ViewCaptureActivity.class);
+                    /*Intent intent = new Intent(this, ViewCaptureActivity.class);
                     intent.putExtra(GlobalVars.EXTRA_PATH, resultFileName);
-                    startActivityForResult(intent, GlobalVars.INTENT_FINISH_PARENT);
+                    startActivityForResult(intent, GlobalVars.INTENT_FINISH_PARENT);*/
                 }
                 break;
             /*case GlobalVars.INTENT_CAPTURE_LEFT:

@@ -21,6 +21,7 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -31,7 +32,6 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,8 +51,6 @@ import java.util.concurrent.TimeUnit;
 
 public class StereoCameraActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener, View.OnClickListener {
     private TextureView leftView, rightView;
-
-    private static final int REQUEST_PERMISSIONS = 200;
 
     private static final int STATE_PREVIEW = 0;
     private static final int STATE_WAITING_LOCK = 1;
@@ -105,13 +103,13 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
     private Handler mBackgroundHandler;
 
     private ImageReader mImageReader;
-    private File leftFile;
-    private File rightFile;
+    private Uri leftUri;
+    private Uri rightUri;
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener
             = new ImageReader.OnImageAvailableListener() {
         @Override
         public void onImageAvailable(ImageReader reader) {
-            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), (imagesTaken.get(imagesTaken.size() - 1) == LEFT_IMAGE) ? leftFile : rightFile));
+            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), (imagesTaken.get(imagesTaken.size() - 1) == LEFT_IMAGE) ? leftUri : rightUri));
         }
     };
 
@@ -132,8 +130,6 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
                     break;
                 }
                 case STATE_WAITING_LOCK: {
-                    //mState = STATE_PICTURE_TAKEN;
-                    //captureStillPicture();
                     Integer afState = result.get(CaptureResult.CONTROL_AF_STATE);
                     if (afState == null) {
                         System.out.println("null");
@@ -221,8 +217,8 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
         setContentView(R.layout.activity_stereo_camera);
         leftView = (TextureView) findViewById(R.id.leftView);
         rightView = (TextureView) findViewById(R.id.rightView);
-        leftFile = new File(getIntent().getStringExtra(GlobalVars.EXTRA_LEFT_OUTPUT));
-        rightFile = new File(getIntent().getStringExtra(GlobalVars.EXTRA_RIGHT_OUTPUT));
+        leftUri = getIntent().getParcelableExtra(GlobalVars.EXTRA_LEFT_OUTPUT);
+        rightUri = getIntent().getParcelableExtra(GlobalVars.EXTRA_RIGHT_OUTPUT);
     }
 
     @Override
@@ -309,25 +305,13 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
         if (null == leftView || null == rightView || null == mPreviewSize) {
             return;
         }
-        int rotation = getWindowManager().getDefaultDisplay().getRotation();
-        Matrix matrix = new Matrix();
-        RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
-        RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
-        float centerX = viewRect.centerX();
-        float centerY = viewRect.centerY();
-        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
-            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
-            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
-            float scale = Math.max(
-                    (float) viewHeight / mPreviewSize.getHeight(),
-                    (float) viewWidth / mPreviewSize.getWidth());
-            matrix.postScale(scale, scale, centerX, centerY);
-            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
-        } else if (Surface.ROTATION_180 == rotation) {
-            matrix.postRotate(180, centerX, centerY);
-        }
-        leftView.setTransform(matrix);
-        rightView.setTransform(matrix);
+        Matrix txform = new Matrix();
+        leftView.getTransform(txform);
+        float aspectRatio = ((float)viewWidth/viewHeight)/((float)mPreviewSize.getWidth()/mPreviewSize.getHeight());
+        txform.setScale(1, aspectRatio);
+        txform.postTranslate(0, (0.5f-0.5f*aspectRatio)*viewHeight);
+        leftView.setTransform(txform);
+        rightView.setTransform(txform);
     }
 
     private void openCamera(int width, int height) {
@@ -589,11 +573,11 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
 
     private static class ImageSaver implements Runnable {
         private final Image mImage;
-        private final File mFile;
+        private final Uri uri;
 
-        private ImageSaver(Image image, File file) {
+        private ImageSaver(Image image, Uri uri) {
             mImage = image;
-            mFile = file;
+            this.uri = uri;
         }
 
         @Override
@@ -603,7 +587,7 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
             buffer.get(bytes);
             FileOutputStream output = null;
             try {
-                output = new FileOutputStream(mFile);
+                output = new FileOutputStream(uri.getPath());
                 output.write(bytes);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -618,7 +602,6 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
                 }
             }
         }
-
     }
 
     private static class CompareSizesByArea implements Comparator<Size> {

@@ -23,8 +23,8 @@ public class GlobalVars {
 
     public static final int REQUEST_CODE_FILE_PERMISSION = 1;
 
-    public static final int INTENT_CAPTURE_LEFT = 1;
-    public static final int INTENT_CAPTURE_RIGHT = 2;
+    //public static final int INTENT_CAPTURE_LEFT = 1;
+    //public static final int INTENT_CAPTURE_RIGHT = 2;
     public static final int INTENT_CAPTURE_STEREO = 4;
     public static final int INTENT_FINISH_PARENT = 3;
 

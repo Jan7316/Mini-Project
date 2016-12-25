@@ -47,7 +47,9 @@
         <activity
             android:name=".GuideActivity"
             android:screenOrientation="landscape"></activity>
-        <activity android:name=".StereoCameraActivity"></activity>
+        <activity
+            android:name=".StereoCameraActivity"
+            android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>
