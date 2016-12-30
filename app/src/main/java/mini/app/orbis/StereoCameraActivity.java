@@ -33,7 +33,6 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -47,6 +46,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author JS
+ * TODO: Got "android.hardware.camera2.CameraAccessException: Process hosting the camera service has died unexpectedly" at first image on SG S6 Edge
  */
 
 public class StereoCameraActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener, View.OnClickListener {
@@ -69,6 +69,7 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
     private Surface leftSurface;
     private Surface rightSurface;
     private boolean otherSurfaceInitialized;
+    private TotalCaptureResult firstResult;
 
     private String mCameraId;
     private CameraCaptureSession mCaptureSession;
@@ -145,6 +146,9 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
                             System.out.println("aeNotAlright");
                             runPrecaptureSequence();
                         }
+                    }
+                    else {
+                        System.out.println("Can't seem to focus. State: "+afState);
                     }
                     break;
                 }
@@ -305,13 +309,23 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
         if (null == leftView || null == rightView || null == mPreviewSize) {
             return;
         }
-        Matrix txform = new Matrix();
-        leftView.getTransform(txform);
-        float aspectRatio = ((float)viewWidth/viewHeight)/((float)mPreviewSize.getWidth()/mPreviewSize.getHeight());
-        txform.setScale(1, aspectRatio);
-        txform.postTranslate(0, (0.5f-0.5f*aspectRatio)*viewHeight);
-        leftView.setTransform(txform);
-        rightView.setTransform(txform);
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        Matrix matrix = new Matrix();
+        RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
+        RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
+        float centerX = viewRect.centerX();
+        float centerY = viewRect.centerY();
+        if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
+            bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
+            matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
+            float scale = 1/((float)mPreviewSize.getWidth()/viewWidth);
+            matrix.postScale(scale, scale, centerX, centerY);
+            matrix.postRotate(90 * (rotation - 2), centerX, centerY);
+        } else if (Surface.ROTATION_180 == rotation) {
+            matrix.postRotate(180, centerX, centerY); // TODO: Not tested. Is it even needed?
+        }
+        leftView.setTransform(matrix);
+        rightView.setTransform(matrix);
     }
 
     private void openCamera(int width, int height) {
@@ -463,12 +477,21 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
             if (null == mCameraDevice) {
                 return;
             }
-            final CaptureRequest.Builder captureBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-            captureBuilder.addTarget(mImageReader.getSurface());
-
-            captureBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                    CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
-            setAutoFlash(captureBuilder);
+            CaptureRequest.Builder captureBuilder;
+            if (!imagesTaken.isEmpty() && false) {
+                captureBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_MANUAL);
+                captureBuilder.set(CaptureRequest.LENS_FOCUS_DISTANCE, firstResult.get(CaptureResult.LENS_FOCUS_DISTANCE));
+                captureBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, firstResult.get(CaptureResult.SENSOR_EXPOSURE_TIME));
+                captureBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, firstResult.get(CaptureResult.SENSOR_SENSITIVITY));
+                captureBuilder.set(CaptureRequest.LENS_APERTURE, firstResult.get(CaptureResult.LENS_APERTURE));
+                setAutoFlash(captureBuilder);
+            }
+            else {
+                captureBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+                captureBuilder.addTarget(mImageReader.getSurface());
+                captureBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_AUTO);
+                setAutoFlash(captureBuilder);
+            }
 
             //TODO: JPEG orientation needed?
 
@@ -485,6 +508,7 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
                         finish();
                     }
                     else {
+                        firstResult = result;
                         unlockFocus();
                     }
                 }
@@ -501,6 +525,8 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
         try {
             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,
                     CameraMetadata.CONTROL_AF_TRIGGER_CANCEL);
+            mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER,
+                    CameraMetadata.CONTROL_AF_TRIGGER_IDLE);
 
             setAutoFlash(mPreviewRequestBuilder);
             updatePreviewRequestBuilderTargets();

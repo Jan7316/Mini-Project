@@ -95,8 +95,11 @@ public class ImportActivity extends AppCompatActivity {
 
     public void startImageCapture(View view) {
         //takePicture(false);
-        String leftOutputPath = Environment.getExternalStorageDirectory().toString() + "/Orbis/latest_capture_left.jpg"; //TODO: Add .temp back
-        String rightOutputPath = Environment.getExternalStorageDirectory().toString() + "/Orbis/latest_capture_right.jpg";
+        String tempFolderPath = Environment.getExternalStorageDirectory().toString() + "/Orbis/.temp";
+        File tempFolder = new File(tempFolderPath);
+        tempFolder.mkdirs();
+        String leftOutputPath = tempFolderPath + "/latest_capture_left.jpg";
+        String rightOutputPath = tempFolderPath + "/latest_capture_right.jpg";
         File leftFile = new File(leftOutputPath);
         File rightFile = new File(rightOutputPath);
         Intent stereoCameraIntent = new Intent(this, StereoCameraActivity.class);
@@ -131,7 +134,7 @@ public class ImportActivity extends AppCompatActivity {
                     break; // TODO image capture failed/was cancelled
                 }
                 String orbisPath = Environment.getExternalStorageDirectory().toString() + "/Orbis";
-                String basePath = orbisPath + "/latest_capture_"; // TODO: Add .temp back
+                String basePath = orbisPath + "/.temp/latest_capture_";
                 String pathLeft = basePath + "left.jpg";
                 String pathRight = basePath + "right.jpg";
                 File left = new  File(pathLeft);
@@ -141,7 +144,7 @@ public class ImportActivity extends AppCompatActivity {
                     Bitmap rightBitmap = BitmapFactory.decodeFile(right.getAbsolutePath());
                     Bitmap combined = combineImages(leftBitmap, rightBitmap);
 
-                    int imageNum = 0; // TODO: Save current image number indstead of loopig through all possibilities every time
+                    int imageNum = 0; // TODO: Save current image number instead of loopig through all possibilities every time
                     File file = new File(orbisPath + "/OrbisImage_"+imageNum+".jps");
                     while(file.exists()) {
                         imageNum ++;

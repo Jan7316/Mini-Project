@@ -24,10 +24,6 @@ import com.github.angads25.filepicker.view.FilePickerDialog;
 
 import java.io.File;
 
-/*
- * TODO: Bug: Once when I deleted several images (about 5), the app went back to the home screen after removing the files
- */
-
 public class GalleryActivity extends AppCompatActivity implements GalleryItemFragment.OnFragmentInteractionListener, ViewTreeObserver.OnScrollChangedListener {
 
     private boolean reInitFragments, alreadyInitializedSpaces;
