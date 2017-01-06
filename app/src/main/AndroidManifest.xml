@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="mini.app.orbis">
+    package="mini.app.orbis">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.android.vending.BILLING" />
 
     <application
@@ -18,34 +19,37 @@
             android:hardwareAccelerated="false"
             android:screenOrientation="landscape">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".GalleryActivity"
-            android:screenOrientation="landscape"/>
+            android:screenOrientation="landscape" />
         <activity
             android:name=".VRViewerActivity"
             android:label="@string/title_activity_vrviewer"
             android:screenOrientation="landscape"
-            android:theme="@style/AppTheme"/>
-        <activity android:name=".ImportActivity"
-                  android:screenOrientation="landscape">
-        </activity>
-        <activity android:name=".ViewCaptureActivity"
-                  android:screenOrientation="landscape">
-        </activity>
-        <activity android:name=".CombineImagesActivity"
-                  android:screenOrientation="landscape">
-        </activity>
-        <activity android:name=".GuideMenuActivity"
-                  android:screenOrientation="landscape">
-        </activity>
-        <activity android:name=".GuideActivity"
-                  android:screenOrientation="landscape">
-        </activity>
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".ImportActivity"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".ViewCaptureActivity"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".CombineImagesActivity"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".GuideMenuActivity"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".GuideActivity"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".StereoCameraActivity"
+            android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>

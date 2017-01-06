@@ -172,7 +172,7 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
             if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
                     ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this,
-                        new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
                         GlobalVars.REQUEST_CODE_FILE_PERMISSION);
             } else {
                 Intent intent = new Intent(this, GalleryActivity.class);
@@ -194,14 +194,15 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
 
                     Intent intent = new Intent(this, GalleryActivity.class);
                     startActivity(intent);
                 } else {
                     AlertDialog dialog = new AlertDialog.Builder(this)
                             .setTitle("App Permissions")
-                            .setMessage("The app requires both of these permissions in order to display images in the gallery and save pictures that you took with the 3D camera." +
+                            .setMessage("The app requires these permissions in order to display images in the gallery and save pictures that you took with the 3D camera." +
                                         "Please grant them in order to proceed.")
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .setNeutralButton("Dismiss", null).create();
