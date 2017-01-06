@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.PermissionChecker;
@@ -105,24 +106,31 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
                 if (!result.isSuccess()) {
                     // Oh no, there was a problem.
                     Log.d("Orbis", "Problem setting up In-app Billing: " + result);
+                } else {
+                    checkPurchaseStatus();
                 }
-                // Hooray, IAB is fully set up!
             }
         });
+    }
 
+    private void checkPurchaseStatus() {
         SharedPreferences usageStats = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
         long firstUsage = usageStats.getLong(GlobalVars.KEY_FIRST_USAGE, new Date().getTime());
         Log.d("Orbis", "First usage was " + firstUsage);
         long today = new Date().getTime();
         long trialPeriod = 1000 * 60 * 60 * 24 * 7;
+        if(GlobalVars.isDebug) {
+            active = true;
+            return;
+        }
         if(today > firstUsage + trialPeriod) {
             active = false;
-            Log.d("Orbis", "The trial period has elapsed: " + (today - firstUsage) + " ms");
+            Log.d("Orbis", "The trial period has elapsed: " + ((today - firstUsage) / (1000 * 60 * 60 * 24)) + " days");
             try {
                 mHelper.queryInventoryAsync(new IabHelper.QueryInventoryFinishedListener() {
                     public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
                         if (result.isFailure()) {
-                            // handle error here
+                            Log.d("Orbis", "Query Inventory Finished Error");
                         }
                         else {
                             active = inventory.hasPurchase(GlobalVars.SKU_PREMIUM);
@@ -131,6 +139,7 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
                     }
                 });
             } catch(IabHelper.IabAsyncInProgressException e) {
+                Log.d("Orbis", "IAB query failed");
                 e.printStackTrace();
             }
         } else {
@@ -207,8 +216,7 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
     }
 
     @Override
-    public void onIabPurchaseFinished(IabResult result, Purchase purchase)
-    {
+    public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
         if (result.isFailure()) {
             Log.d("Orbis", "Error purchasing: " + result);
         } else if (purchase.getSku().equals(GlobalVars.SKU_PREMIUM)) {
@@ -222,6 +230,18 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
             dialog.getWindow().getDecorView().setSystemUiVisibility(
                     this.getWindow().getDecorView().getSystemUiVisibility());
             dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("Orbis", "onActivityResult(" + requestCode + "," + resultCode + "," + data);
+        // Pass on the activity result to the helper for handling
+        if(!mHelper.handleActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
+        } else {
+            Log.d("Orbis", "onActivityResult handled by IABUtil.");
         }
     }
 
