@@ -99,7 +99,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/gallery_container"
-                    app:columnCount="4">
+                    app:columnCount="3">
                 </android.support.v7.widget.GridLayout>
             </LinearLayout>
         </ScrollView>

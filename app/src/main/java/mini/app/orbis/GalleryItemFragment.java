@@ -66,6 +66,7 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
 
         fragmentID = getArguments().getInt(GlobalVars.FRAGMENT_ID);
 
+        Log.d("Orbis", "Listener informed of fragment inflation");
         mListener.onFragmentInflated(this, layout);
 
         return layout;

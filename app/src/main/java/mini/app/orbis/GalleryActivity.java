@@ -111,13 +111,13 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
                 int viewID = View.generateViewId();
                 spaceViewIds[i] = viewID;
                 space.setId(viewID);
-                GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+                android.support.v7.widget.GridLayout.LayoutParams layoutParams = new android.support.v7.widget.GridLayout.LayoutParams();
                 layoutParams.height = ((GalleryItemFragment) getSupportFragmentManager().getFragments().get(0)).getHeight();
                 layoutParams.width = 1;
-                layoutParams.columnSpec = GridLayout.spec(3);
-                layoutParams.rowSpec = GridLayout.spec(i);
+                layoutParams.columnSpec = android.support.v7.widget.GridLayout.spec(0);
+                layoutParams.rowSpec = android.support.v7.widget.GridLayout.spec(i);
                 space.setLayoutParams(layoutParams);
-                ((GridLayout) findViewById(R.id.gallery_container)).addView(space);
+                ((android.support.v7.widget.GridLayout) findViewById(R.id.gallery_container)).addView(space);
             }
             alreadyInitializedSpaces = true;
         }
@@ -134,7 +134,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
             int[] newSpaceList = new int[numberRequired];
             System.arraycopy(spaceViewIds, 0, newSpaceList, 0, numberRequired);
             for(int i=numberRequired;i<spaceViewIds.length;i++) {
-                ((GridLayout) findViewById(R.id.gallery_container)).removeView(findViewById(spaceViewIds[i]));
+                ((android.support.v7.widget.GridLayout) findViewById(R.id.gallery_container)).removeView(findViewById(spaceViewIds[i]));
             }
             spaceViewIds = newSpaceList;
         } else if(numberRequired > spaceViewIds.length) {
@@ -145,13 +145,13 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
                 int viewID = View.generateViewId();
                 newSpaceList[i] = viewID;
                 space.setId(viewID);
-                GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+                android.support.v7.widget.GridLayout.LayoutParams layoutParams = new android.support.v7.widget.GridLayout.LayoutParams();
                 layoutParams.height = ((GalleryItemFragment) getSupportFragmentManager().getFragments().get(0)).getHeight();
                 layoutParams.width = 1;
-                layoutParams.columnSpec = GridLayout.spec(3);
-                layoutParams.rowSpec = GridLayout.spec(i);
+                layoutParams.columnSpec = android.support.v7.widget.GridLayout.spec(2);
+                layoutParams.rowSpec = android.support.v7.widget.GridLayout.spec(i);
                 space.setLayoutParams(layoutParams);
-                ((GridLayout) findViewById(R.id.gallery_container)).addView(space);
+                ((android.support.v7.widget.GridLayout) findViewById(R.id.gallery_container)).addView(space);
             }
             spaceViewIds = newSpaceList;
         }
@@ -165,7 +165,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
 
     private void applyScrollToFragment(int fragmentID, int cellID, int topRow, boolean forceImageUpdate, View fragmentView) {
 
-        if(!alreadyInitializedSpaces) {
+        /*if(!alreadyInitializedSpaces) {
             File[] images = FileManager.getFiles(this);
             int numberRequired = images.length / columnCount() + (images.length % columnCount() > 0 ? 1 : 0);
             spaceViewIds = new int[numberRequired];
@@ -176,6 +176,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
                 space.setId(viewID);
                 GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
                 layoutParams.height = ((GalleryItemFragment) getSupportFragmentManager().getFragments().get(0)).getHeight();
+                Log.d("Orbis", "(applyScrollToFragment) Space " + i + ": Height is " + ((GalleryItemFragment) getSupportFragmentManager().getFragments().get(0)).getHeight());
                 layoutParams.width = 1;
                 layoutParams.columnSpec = GridLayout.spec(3);
                 layoutParams.rowSpec = GridLayout.spec(i);
@@ -183,7 +184,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
                 ((android.support.v7.widget.GridLayout) findViewById(R.id.gallery_container)).addView(space);
             }
             alreadyInitializedSpaces = true;
-        }
+        }*/
 
         if(fragmentID == -1) // Can happen if the user returns to the menu while some fragment have not yet finished inflating
             return;
@@ -212,12 +213,12 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
 
             fragmentView.setVisibility(View.VISIBLE);
             String filename = images[cellID].getName();
-            Log.d("Orbis", "The file for fragment " + fragmentID + " is " + filename);
+            //Log.d("Orbis", "The file for fragment " + fragmentID + " is " + filename);
             if(Cache.isBitmapCached(filename)) {
-                Log.d("Orbis", "Loading from cache " + fragmentID);
+                //Log.d("Orbis", "Loading from cache " + fragmentID);
                 fragment.applyImage(cellID, Cache.getBitmapFromMemCache(filename), fragmentView);
             } else if(!Cache.isBitmapBeingLoaded(filename)) {
-                Log.d("Orbis", "Async task started for fragment " + fragmentID);
+                //Log.d("Orbis", "Async task started for fragment " + fragmentID);
                 Cache.markBitmapAsBeingLoaded(filename, true);
                 fragment.markAsLoading();
                 new AsyncTaskLoadThumbnail(this, cellID, filename, images[cellID]).execute();
