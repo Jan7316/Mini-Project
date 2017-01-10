@@ -84,10 +84,8 @@ public class ImportActivity extends AppCompatActivity {
     private void handleFileSelection(String[] selection) {
         for(String fileString : selection) {
             File file = new File(fileString);
-            Log.d("Orbis", "Handling file to be referenced: " + fileString);
             if(file.exists()) {
                 FileManager.addReferences(this, file);
-                Log.d("Orbis", "File reference was created: " + fileString);
             }
         }
         finish();

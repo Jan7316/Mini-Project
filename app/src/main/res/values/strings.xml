@@ -26,7 +26,19 @@
     <string name="diashow_started">Diashow started</string>
     <string name="diashow_ended">Diashow stopped</string>
 
-    <!-- Diashow settings -->
+    <!-- Diashow settings (TODO for a later release) -->
     <string name="diashow_settings_title">Diashow Settings</string>
+
+    <!-- Initial welcome screen -->
+    <string name="iw_choose">Please choose one of the following options:</string>
+    <string name="iw_bought">I have bought an Orbis VR headset</string>
+    <string name="iw_not_bought">I have not bought an Orbis VR headset</string>
+
+    <!-- Verify purchase screen -->
+    <string name="vp_instructions">To unlock the app, press the \'unlock now\' button below. This will open a dialog window asking you to purchase the app. DO NOT CLICK ON \'BUY\'! Rather, tap the price label, which will bring up several options. Select redeem and enter the code you received at the time of purchase or by e-mail.</string>
+    <string name="vp_unlock">Unlock now</string>
+    <string name="vp_back">Go back</string>
+    <string name="np_info">Welcome to Orbis VR! By downloading this app, you have started a 7-day free trial. After this period, you can choose to purchase the app for €0.99 to continue using it.</string> <!-- TODO should be improved -->
+    <string name="np_start">Try it out!</string>
 
 </resources>

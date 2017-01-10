@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center_horizontal">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_orbis_title"
+        android:scaleType="fitStart"
+        android:adjustViewBounds="true"
+        android:layout_marginTop="50dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/vp_info_text_size"
+        android:layout_marginTop="40dp"
+        android:text="@string/vp_instructions"
+        android:textColor="@color/colorText"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        android:id="@+id/instructions"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="right"
+        android:layout_marginTop="40dp"
+        android:clipToPadding="false">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/vp_unlock"
+            android:background="@null"
+            android:elevation="2dp"
+            android:textColor="@color/colorButton"
+            android:layout_marginRight="@dimen/iw_b_distance"
+            android:onClick="unlock"
+            android:textSize="@dimen/iw_b_text_size"
+            android:id="@+id/unlock"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/vp_back"
+            android:background="@null"
+            android:textColor="@color/colorButton"
+            android:elevation="2dp"
+            android:textSize="@dimen/iw_b_text_size"
+            android:onClick="back"
+            android:layout_marginRight="@dimen/iw_b_distance"
+            android:id="@+id/back"/>
+    </LinearLayout>
+
+</LinearLayout>

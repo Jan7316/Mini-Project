@@ -23,6 +23,7 @@ public class GlobalVars {
     public static final String USAGE_STATS_PREFERENCE_FILE = "usage";
 
     public static final String KEY_FIRST_USAGE = "firstusage";
+    public static final String KEY_INITIALISED = "initialised";
 
     public static final int REQUEST_CODE_FILE_PERMISSION = 1;
 

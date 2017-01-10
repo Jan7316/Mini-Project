@@ -29,7 +29,6 @@ public class AsyncTaskLoadThumbnail extends AsyncTask {
     @Override
     protected Object doInBackground(Object[] params) {
         if(!isCancelled()) {
-            Log.d("Orbis", "Working on " + cellID);
             Bitmap bitmap = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(file.getAbsolutePath()), 800, 300); // TODO the proportions of this may be way out of line
             Bitmap leftHalf = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth() / 2, bitmap.getHeight());
             Cache.addBitmapToMemoryCache(id, leftHalf);

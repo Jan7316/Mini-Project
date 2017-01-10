@@ -60,6 +60,15 @@
     <!-- Diashow settings activity -->
     <dimen name="settings_content_margin_top">30dp</dimen>
 
+    <!-- Initial welcome screen -->
+    <dimen name="iw_title_height">100dp</dimen>
+    <dimen name="iw_q_text_size">25dp</dimen>
+    <dimen name="iw_b_text_size">20dp</dimen>
+    <dimen name="iw_b_distance">40dp</dimen>
+
+    <!-- Purchase verification and introduction for users who have not bought a headset -->
+    <dimen name="vp_info_text_size">20dp</dimen>
+
 
     <dimen name="single_elevation">2dp</dimen>
 

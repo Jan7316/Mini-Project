@@ -34,22 +34,34 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ImportActivity"
-            android:screenOrientation="landscape"></activity>
+            android:screenOrientation="landscape" />
         <activity
             android:name=".ViewCaptureActivity"
-            android:screenOrientation="landscape"></activity>
+            android:screenOrientation="landscape" />
         <activity
             android:name=".CombineImagesActivity"
-            android:screenOrientation="landscape"></activity>
+            android:screenOrientation="landscape" />
         <activity
             android:name=".GuideMenuActivity"
-            android:screenOrientation="landscape"></activity>
+            android:screenOrientation="landscape" />
         <activity
             android:name=".GuideActivity"
-            android:screenOrientation="landscape"></activity>
+            android:screenOrientation="landscape" />
         <activity
             android:name=".StereoCameraActivity"
-            android:screenOrientation="landscape"></activity>
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".InitialWelcomeActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".VerifyPurchaseActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".TrialIntroductionActivity"
+            android:screenOrientation="landscape" />
+        <activity
+            android:name=".PurchaseSuccessfulActivity"
+            android:screenOrientation="landscape" />
     </application>
 
 </manifest>

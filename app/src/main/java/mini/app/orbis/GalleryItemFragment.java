@@ -55,7 +55,6 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("Orbis", "OnFragmentInflated called");
         // Inflate the layout for this fragment
         layout = inflater.inflate(R.layout.fragment_gallery_item, container, false);
 
@@ -66,7 +65,6 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
 
         fragmentID = getArguments().getInt(GlobalVars.FRAGMENT_ID);
 
-        Log.d("Orbis", "Listener informed of fragment inflation");
         mListener.onFragmentInflated(this, layout);
 
         return layout;
@@ -93,9 +91,6 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
             imageView.setImageBitmap(bitmap);
             updateColorFilter();
             imageView.invalidate();
-            Log.d("Orbis", "Image was set on cell " + cellID);
-        } else {
-            Log.d("Orbis", "Image could not be set as view was null");
         }
     }
 
@@ -109,7 +104,6 @@ public class GalleryItemFragment extends Fragment implements View.OnClickListene
             imageView.setImageBitmap(bitmap);
             updateColorFilter();
             imageView.invalidate();
-            Log.d("Orbis", "Image was set on cell " + cellID);
         } else {
             ImageView imageView = (ImageView) view.findViewById(R.id.image);
             imageView.setImageBitmap(bitmap);

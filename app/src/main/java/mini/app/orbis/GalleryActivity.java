@@ -93,7 +93,6 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         GalleryItemFragment fragment = getFragmentForCellId(cellID);
         if(getCellIdForFragment(indexOfFragment(fragment)) == cellID) {
             fragment.applyImage(cellID, Cache.getBitmapFromMemCache(imageID));
-            Log.d("Orbis", "Image was applied for cell " + cellID);
         }
     }
 
@@ -128,6 +127,8 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
     }
 
     public void updateSpaces() {
+        if(spaceViewIds == null)
+            return;
         File[] images = FileManager.getFiles(this);
         int numberRequired = images.length / columnCount() + (images.length % columnCount() > 0 ? 1 : 0);
         if(numberRequired < spaceViewIds.length) {
@@ -159,7 +160,6 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
 
     @Override
     public void onFragmentInflated(GalleryItemFragment fragment, View view) {
-        Log.d("Orbis", "Fragment " + indexOfFragment(fragment) + " was inflated");
         applyScrollToFragment(indexOfFragment(fragment), getCellIdForFragment(indexOfFragment(fragment)), 0, false, view);
     }
 
@@ -213,12 +213,9 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
 
             fragmentView.setVisibility(View.VISIBLE);
             String filename = images[cellID].getName();
-            //Log.d("Orbis", "The file for fragment " + fragmentID + " is " + filename);
             if(Cache.isBitmapCached(filename)) {
-                //Log.d("Orbis", "Loading from cache " + fragmentID);
                 fragment.applyImage(cellID, Cache.getBitmapFromMemCache(filename), fragmentView);
             } else if(!Cache.isBitmapBeingLoaded(filename)) {
-                //Log.d("Orbis", "Async task started for fragment " + fragmentID);
                 Cache.markBitmapAsBeingLoaded(filename, true);
                 fragment.markAsLoading();
                 new AsyncTaskLoadThumbnail(this, cellID, filename, images[cellID]).execute();
@@ -249,6 +246,7 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
                 findViewById(R.id.gallery_scroll).setBackgroundResource(0);
             }
         }
+        updateSpaces();
     }
 
     private int getCellIdForFragment(int fragmentID) {
@@ -386,8 +384,6 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        Log.d("Orbis", "Delete pictures");
-
                         int[] indices = Util.allIndices(true, getSelectedItems());
                         deleteItems(indices);
                     }})
@@ -440,45 +436,11 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         Intent intent = new Intent(this, VRViewerActivity.class);
         intent.putExtra(GlobalVars.EXTRA_PATH, FileManager.getFiles(this)[itemID].getAbsolutePath());
         intent.putExtra(GlobalVars.EXTRA_IMAGE_ID, itemID);
-        Log.d("Orbis", FileManager.getFiles(this)[itemID].getAbsolutePath());
         startActivity(intent);
     }
 
     public void navigateBack(View view) {
         finish();
-    }
-
-    /**
-     * This functionality was replaced by ImportActivity
-     */
-    @Deprecated
-    public void chooseFolder(View view) {
-        DialogProperties properties = new DialogProperties();
-
-        properties.selection_mode= DialogConfigs.SINGLE_MODE;
-        properties.selection_type=DialogConfigs.DIR_SELECT;
-        properties.root=new File(DialogConfigs.DEFAULT_DIR); // TODO the file chooser does not allow to switch between primary and secondary storage
-        properties.error_dir=new File(DialogConfigs.DEFAULT_DIR);
-        properties.extensions=null;
-
-        FilePickerDialog dialog = new FilePickerDialog(GalleryActivity.this,properties);
-        dialog.setTitle("Choose Folder");
-
-        dialog.setDialogSelectionListener(new DialogSelectionListener() {
-            @Override
-            public void onSelectedFilePaths(String[] files) {
-                Log.d("Orbis", files[0]);
-            } // TODO actually implement a folder change
-        });
-
-        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-        dialog.show();
-        dialog.getWindow().getDecorView().setSystemUiVisibility(
-                this.getWindow().getDecorView().getSystemUiVisibility());
-        dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-
-        /*Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        startActivityForResult(intent, FOLDER_CHOOSER_INTENT_ID);*/
     }
 
     public void addItems(View view) {

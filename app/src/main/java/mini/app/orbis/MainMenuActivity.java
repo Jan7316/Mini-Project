@@ -6,10 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -92,6 +90,12 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
         menu.setAnimation(fadeInMenu);
 
         initializeIAB();
+
+        SharedPreferences usageStats = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
+        boolean initialised = usageStats.getBoolean(GlobalVars.KEY_INITIALISED, false);
+        if(!initialised) {
+            startActivity(new Intent(this, InitialWelcomeActivity.class));
+        }
     }
 
     private void initializeIAB() {
@@ -116,7 +120,6 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
     private void checkPurchaseStatus() {
         SharedPreferences usageStats = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
         long firstUsage = usageStats.getLong(GlobalVars.KEY_FIRST_USAGE, new Date().getTime());
-        Log.d("Orbis", "First usage was " + firstUsage);
         long today = new Date().getTime();
         long trialPeriod = 1000 * 60 * 60 * 24 * 7;
         if(GlobalVars.isDebug) {
@@ -125,16 +128,13 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
         }
         if(today > firstUsage + trialPeriod) {
             active = false;
-            Log.d("Orbis", "The trial period has elapsed: " + ((today - firstUsage) / (1000 * 60 * 60 * 24)) + " days");
             try {
                 mHelper.queryInventoryAsync(new IabHelper.QueryInventoryFinishedListener() {
                     public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
                         if (result.isFailure()) {
-                            Log.d("Orbis", "Query Inventory Finished Error");
                         }
                         else {
                             active = inventory.hasPurchase(GlobalVars.SKU_PREMIUM);
-                            Log.d("Orbis", "Purchase status: " + active);
                         }
                     }
                 });
@@ -143,7 +143,6 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
                 e.printStackTrace();
             }
         } else {
-            Log.d("Orbis", "The trial period has not yet elapsed: " + (today - firstUsage) + " ms");
             active = true;
             SharedPreferences sharedPref = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
@@ -220,29 +219,27 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
     public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
         if (result.isFailure()) {
             Log.d("Orbis", "Error purchasing: " + result);
-        } else if (purchase.getSku().equals(GlobalVars.SKU_PREMIUM)) {
-            active = true;
             AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setTitle("Thank You")
-                    .setMessage("You have successfully unlocked Orbis VR for unlimited usage.")
-                    .setNeutralButton("Enjoy!", null).create();
+                    .setTitle("An Error Occurred")
+                    .setMessage("An error has occurred while processing your purchase. Please try again. If this error persists, please reinstall the app or contact the Orbis team.")
+                    .setIcon(R.drawable.ic_error)
+                    .setNeutralButton("Dismiss", null).create();
             dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
             dialog.show();
             dialog.getWindow().getDecorView().setSystemUiVisibility(
                     this.getWindow().getDecorView().getSystemUiVisibility());
             dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        } else if (purchase.getSku().equals(GlobalVars.SKU_PREMIUM)) {
+            startActivity(new Intent(this, PurchaseSuccessfulActivity.class));
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("Orbis", "onActivityResult(" + requestCode + "," + resultCode + "," + data);
         // Pass on the activity result to the helper for handling
         if(!mHelper.handleActivityResult(requestCode, resultCode, data)) {
             super.onActivityResult(requestCode, resultCode, data);
-        } else {
-            Log.d("Orbis", "onActivityResult handled by IABUtil.");
         }
     }
 

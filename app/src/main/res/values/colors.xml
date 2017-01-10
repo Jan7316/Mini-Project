@@ -8,4 +8,6 @@
     <color name="colorTitle">#FFFFFFFF</color>
     <color name="colorButton">#FF0060FF</color>
     <color name="colorButtonDisabled">#FF90B0FF</color>
+    <color name="colorPositive">#FF90FF90</color>
+    <color name="colorPositiveButton">#FF002000</color>
 </resources>
