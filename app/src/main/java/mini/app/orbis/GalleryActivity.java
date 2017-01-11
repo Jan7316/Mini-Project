@@ -466,5 +466,4 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
             return;
         selectedItems[item] = status;
     }
-
 }

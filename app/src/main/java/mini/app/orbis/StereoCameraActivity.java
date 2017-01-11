@@ -583,17 +583,21 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.leftView) {
-            if (!imagesTaken.contains(LEFT_IMAGE)) {
-                imagesTaken.add(LEFT_IMAGE);
-                takePicture();
-            }
-        }
-        else {
-            if (!imagesTaken.contains(RIGHT_IMAGE)) {
-                imagesTaken.add(RIGHT_IMAGE);
-                takePicture();
-            }
+        switch (v.getId()) {
+            case R.id.leftView:
+                if (!imagesTaken.contains(LEFT_IMAGE)) {
+                    imagesTaken.add(LEFT_IMAGE);
+                    takePicture();
+                }
+                break;
+            case R.id.rightView:
+                if (!imagesTaken.contains(RIGHT_IMAGE)) {
+                    imagesTaken.add(RIGHT_IMAGE);
+                    takePicture();
+                }
+                break;
+            case R.id.cancel:
+                finish();
         }
     }
 
