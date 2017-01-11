@@ -32,6 +32,7 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.Button;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -223,6 +224,7 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
         rightView = (TextureView) findViewById(R.id.rightView);
         leftUri = getIntent().getParcelableExtra(GlobalVars.EXTRA_LEFT_OUTPUT);
         rightUri = getIntent().getParcelableExtra(GlobalVars.EXTRA_RIGHT_OUTPUT);
+        FontManager.applyFontToView(this, (Button) findViewById(R.id.cancel), FontManager.Font.lato);
     }
 
     @Override
@@ -596,9 +598,11 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
                     takePicture();
                 }
                 break;
-            case R.id.cancel:
-                finish();
         }
+    }
+
+    public void cancel(View view) {
+        finish();
     }
 
     private static class ImageSaver implements Runnable {

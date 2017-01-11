@@ -144,4 +144,16 @@ public class VerifyPurchaseActivity extends AppCompatActivity implements IabHelp
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mHelper != null)
+            try {
+                mHelper.dispose();
+            } catch(IabHelper.IabAsyncInProgressException e) {
+                e.printStackTrace();
+            }
+        mHelper = null;
+    }
+
 }

@@ -168,6 +168,8 @@ public class ImportActivity extends AppCompatActivity {
                     left.delete();
                     right.delete();
                     FileManager.updateFolderFiles(this);
+
+                    finish();
                     //new File(storageDir.getAbsolutePath() + "/Orbis/.temp").delete(); // delete the temporary folder (does not work at the moment, an empty folder remains)
                     // shouldn't be deleted at this point as ViewCaptureActivity will load the temporarily stored image from this folder
 

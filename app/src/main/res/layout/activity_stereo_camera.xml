@@ -29,6 +29,7 @@
         android:text="@string/cancel_button_label"
         android:textColor="@color/colorButton"
         android:id="@+id/cancel"
+        android:onClick="cancel"
         android:background="@null"
         android:layout_marginRight="@dimen/import_activity_cancel_button_margin_right"
         android:layout_marginBottom="@dimen/import_activity_cancel_button_margin_bottom"
