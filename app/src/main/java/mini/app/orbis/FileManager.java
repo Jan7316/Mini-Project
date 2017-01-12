@@ -10,6 +10,7 @@ import android.util.Log;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * Created by Jan on 17/11/2016.
@@ -51,20 +52,21 @@ public class FileManager {
     }
 
     public static void deleteItems(Context context, int[] indices) {
-        int count = 0;
-        for(int i=0;i<getOrbisFolderFiles(context).length;i++) {
-            if(Util.contains(indices, i)) {
-                deleteOrbisFolderImage(getOrbisFolderFiles(context)[i]);
+        File[] filesToBeDeleted = new File[indices.length];
+        File[] allFiles = getFiles(context);
+        int iteratedTrough = 0;
+        for(int index : indices) {
+            filesToBeDeleted[iteratedTrough] = allFiles[index];
+            iteratedTrough++;
+        }
+        for(File file : filesToBeDeleted) {
+            if(Util.contains(getOrbisFolderFiles(context), file)) {
+                deleteOrbisFolderImage(file);
+            } if(Util.contains(getReferencedFiles(context), file)) {
+                removeReferences(context, file);
             }
-            count++;
         }
         updateFolderFiles(context);
-        for(int i=count;i<getReferencedFiles(context).length;i++) {
-            if(Util.contains(indices, i)) {
-                removeReferences(context, getReferencedFiles(context)[i]);
-            }
-            count++;
-        }
     }
 
     public static void updateFolderFiles(Context context) {
@@ -95,6 +97,14 @@ public class FileManager {
         File[] combined = new File[referenced.length + orbisFolder.length];
         System.arraycopy(orbisFolder, 0, combined, 0, orbisFolder.length);
         System.arraycopy(referenced, 0, combined, orbisFolder.length, referenced.length);
+        Arrays.sort(combined, new Comparator<File>() {
+            @Override
+            public int compare(File a, File b) { // Sort the files so that newer files (higher number of lastModified) are at the front of the array
+                long alm = a.lastModified();
+                long blm = b.lastModified();
+                return alm < blm ? 1 : (alm > blm ? -1 : (a.getName().compareTo(b.getName())));
+            }
+        });
         return combined;
     }
 
