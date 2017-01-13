@@ -6,7 +6,7 @@ package mini.app.orbis;
 
 public class GlobalVars {
 
-    public static boolean isDebug = true;
+    public static boolean isDebug = false;
 
 
     public static final String EXTRA_PATH = "path";
@@ -42,5 +42,5 @@ public class GlobalVars {
     public static final String rightCapturePath = tempFolderDir + "/latest_capture_right.jpg";
 
 
-    public static final String SKU_PREMIUM = "android.test.purchased"; // TODO URGENT
+    public static final String SKU_PREMIUM = "mini.app.orbis.premium";
 }

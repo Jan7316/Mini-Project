@@ -62,7 +62,7 @@ public class VerifyPurchaseActivity extends AppCompatActivity implements IabHelp
 
     private void initializeIAB() {
         // FROM https://developer.android.com/training/in-app-billing/preparing-iab-app.html -- Will be found in the developer's console
-        String base64EncodedPublicKey = ""; // This should be compiled at runtime from separate strings
+        String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv6hzHkl9PpEokdr6Qp312on05zLKSwjobv/sRcSsc/WPTHnJq2bi7x/+Xa+B1ClbL0Rc+i3gUZSYsTlqHta17dJMHWW8kgaLNX0dnQ2kKDZ/9GwCgsKz5bY0cgtsSWKIRZTNdOFX2NTseCZTF3ouC8KTmAZXTM3VBZ7pJcNfKrXRJ0igsk1AMPawcPBlJCzou4oHtNKdDWUPUwqBuUwlPIynj4uXT7DQy2wWsZ6m5MA2m/+ltWCF4qyZZFuY6KVaxY9WbAvXyVFb2tZX03BThYkwNdaxrJSc4jU0JNWZMVd2Dn9LNEQmc6a7DJ2N4gfV74T3YMlE6Debw4+vAKAtTwIDAQAB";
 
         // compute your public key and store it in base64EncodedPublicKey
         mHelper = new IabHelper(this, base64EncodedPublicKey);
@@ -93,7 +93,6 @@ public class VerifyPurchaseActivity extends AppCompatActivity implements IabHelp
                 }
             });
         } catch(IabHelper.IabAsyncInProgressException e) {
-            Log.d("Orbis", "IAB query failed");
             e.printStackTrace();
         }
     }
@@ -108,7 +107,6 @@ public class VerifyPurchaseActivity extends AppCompatActivity implements IabHelp
     @Override
     public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
         if (result.isFailure()) {
-            Log.d("Orbis", "Error purchasing: " + result);
             AlertDialog dialog = new AlertDialog.Builder(this)
                     .setTitle("An Error Occurred")
                     .setMessage("An error has occurred while processing your purchase. Please try again. If this error persists, please reinstall the app or contact the Orbis team.")
@@ -135,12 +133,9 @@ public class VerifyPurchaseActivity extends AppCompatActivity implements IabHelp
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d("Orbis", "onActivityResult(" + requestCode + "," + resultCode + "," + data);
         // Pass on the activity result to the helper for handling
         if(!mHelper.handleActivityResult(requestCode, resultCode, data)) {
             super.onActivityResult(requestCode, resultCode, data);
-        } else {
-            Log.d("Orbis", "onActivityResult handled by IABUtil.");
         }
     }
 

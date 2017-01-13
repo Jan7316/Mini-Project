@@ -100,7 +100,8 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
 
     private void initializeIAB() {
         // FROM https://developer.android.com/training/in-app-billing/preparing-iab-app.html
-        String base64EncodedPublicKey = ""; // This should be compiled at runtime from separate strings
+        String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv6hzHkl9PpEokdr6Qp312on05zLKSwjobv/sRcSsc/WPTHnJq2bi7x/+Xa+B1ClbL0Rc+i3gUZSYsTlqHta17dJMHWW8kgaLNX0dnQ2kKDZ/9GwCgsKz5bY0cgtsSWKIRZTNdOFX2NTseCZTF3ouC8KTmAZXTM3VBZ7pJcNfKrXRJ0igsk1AMPawcPBlJCzou4oHtNKdDWUPUwqBuUwlPIynj4uXT7DQy2wWsZ6m5MA2m/+ltWCF4qyZZFuY6KVaxY9WbAvXyVFb2tZX03BThYkwNdaxrJSc4jU0JNWZMVd2Dn9LNEQmc6a7DJ2N4gfV74T3YMlE6Debw4+vAKAtTwIDAQAB";
+        // TODO: Including this in one string (as opposed to several substrings) is bad practice but will have to do for the first release
 
         // compute your public key and store it in base64EncodedPublicKey
         mHelper = new IabHelper(this, base64EncodedPublicKey);
@@ -218,7 +219,6 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
     @Override
     public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
         if (result.isFailure()) {
-            Log.d("Orbis", "Error purchasing: " + result);
             AlertDialog dialog = new AlertDialog.Builder(this)
                     .setTitle("An Error Occurred")
                     .setMessage("An error has occurred while processing your purchase. Please try again. If this error persists, please reinstall the app or contact the Orbis team.")
