@@ -8,7 +8,7 @@ public class GuideManager {
 
     public static Guide[] guides = {
             new Guide("About Orbis VR", R.drawable.orbis_logo, "file:///android_asset/guides/aboutorbisvr.html"),
-            new Guide("3D Photography", R.drawable.orbis_logo, "file:///android_asset/guides/3dphotography.html")
+            new Guide("3D Photography", R.drawable.camera_guide_icon, "file:///android_asset/guides/3dphotography.html")
     };
 
     static class Guide {
