@@ -24,6 +24,7 @@ public class GlobalVars {
 
     public static final String KEY_FIRST_USAGE = "firstusage";
     public static final String KEY_INITIALISED = "initialised";
+    public static final String KEY_VRVIEWER_INITIALISED = "vrvinitialised";
 
     public static final int REQUEST_CODE_FILE_PERMISSION = 1;
 

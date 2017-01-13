@@ -1,17 +1,20 @@
 package mini.app.orbis;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -76,6 +79,16 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
         findViewById(R.id.diashow_notification_container).setVisibility(View.GONE);
 
         FontManager.applyFontToView(this, (TextView) findViewById(R.id.title), FontManager.Font.lato);
+
+        SharedPreferences usageStats = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
+        boolean initialised = usageStats.getBoolean(GlobalVars.KEY_VRVIEWER_INITIALISED, false);
+        if(!initialised) {
+            showInstructions();
+            SharedPreferences sharedPref = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putBoolean(GlobalVars.KEY_VRVIEWER_INITIALISED, true);
+            editor.apply();
+        }
     }
 
     @Override
@@ -304,5 +317,17 @@ public class VRViewerActivity extends AppCompatActivity implements AsyncTaskLoad
         TextView diashowNotification = (TextView) findViewById(R.id.diashow_notification);
         diashowNotification.setText(getString(R.string.diashow_ended));
         fadeInAndOutView(findViewById(R.id.diashow_notification_container));
+    }
+
+    private void showInstructions() {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Tip")
+                .setMessage("Long tap the screen to bring up the menu")
+                .setNeutralButton("Continue", null).create();
+        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        dialog.show();
+        dialog.getWindow().getDecorView().setSystemUiVisibility(
+                this.getWindow().getDecorView().getSystemUiVisibility());
+        dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
     }
 }

@@ -7,9 +7,8 @@ package mini.app.orbis;
 public class GuideManager {
 
     public static Guide[] guides = {
-            new Guide("3D Photography", R.drawable.orbis_logo, "file:///android_asset/guides/3dphotography.html"),
-            new Guide("Getting Started", R.drawable.orbis_logo, "file:///android_asset/guides/sample.html"),
-            new Guide("About Orbis VR", R.drawable.orbis_logo, "file:///android_asset/guides/aboutorbisvr.html")
+            new Guide("About Orbis VR", R.drawable.orbis_logo, "file:///android_asset/guides/aboutorbisvr.html"),
+            new Guide("3D Photography", R.drawable.orbis_logo, "file:///android_asset/guides/3dphotography.html")
     };
 
     static class Guide {

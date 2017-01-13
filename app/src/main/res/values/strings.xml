@@ -38,7 +38,7 @@
     <string name="vp_instructions">To unlock the app, press the \'unlock now\' button below. This will open a dialog window asking you to purchase the app. DO NOT CLICK ON \'BUY\'! Rather, tap the price label, which will bring up several options. Select redeem and enter the code you received at the time of purchase or by e-mail.</string>
     <string name="vp_unlock">Unlock now</string>
     <string name="vp_back">Go back</string>
-    <string name="np_info">Welcome to Orbis VR! By downloading this app, you have started a 7-day free trial. After this period, you can choose to purchase the app for €0.99 to continue using it.</string> <!-- TODO should be improved -->
+    <string name="np_info">Welcome to Orbis VR! By downloading this app, you have started a 7-day free trial. After this period, you can choose to purchase the app to continue using it.</string> <!-- TODO should be improved -->
     <string name="np_start">Try it out!</string>
 
 </resources>
