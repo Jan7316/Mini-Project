@@ -224,7 +224,9 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
         rightView = (TextureView) findViewById(R.id.rightView);
         leftUri = getIntent().getParcelableExtra(GlobalVars.EXTRA_LEFT_OUTPUT);
         rightUri = getIntent().getParcelableExtra(GlobalVars.EXTRA_RIGHT_OUTPUT);
+        FontManager.applyFontToView(this, (Button) findViewById(R.id.save), FontManager.Font.lato);
         FontManager.applyFontToView(this, (Button) findViewById(R.id.cancel), FontManager.Font.lato);
+        markAsSaveable(false);
     }
 
     @Override
@@ -505,11 +507,13 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
                     if (imagesTaken.size() >= 2) {
-                        Intent returnIntent = new Intent();
-                        setResult(RESULT_OK,returnIntent);
-                        finish();
-                    }
-                    else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                markAsSaveable(true);
+                            }
+                        });
+                    } else {
                         firstResult = result;
                         unlockFocus();
                     }
@@ -644,5 +648,22 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
             return Long.signum((long) lhs.getWidth() * lhs.getHeight() -
                     (long) rhs.getWidth() * rhs.getHeight());
         }
+    }
+
+    private void markAsSaveable(boolean saveable) {
+        Button button = (Button) findViewById(R.id.save);
+        if(saveable) {
+            button.setTextColor(getResources().getColor(R.color.colorButton));
+            button.setClickable(true);
+        } else {
+            button.setTextColor(getResources().getColor(R.color.colorButtonDisabled));
+            button.setClickable(false);
+        }
+    }
+
+    public void save(View view) {
+        Intent returnIntent = new Intent();
+        setResult(RESULT_OK,returnIntent);
+        finish();
     }
 }

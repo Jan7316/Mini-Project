@@ -93,11 +93,11 @@ public class ImportActivity extends AppCompatActivity {
 
     public void startImageCapture(View view) {
         //takePicture(false);
-        String tempFolderPath = Environment.getExternalStorageDirectory().toString() + "/Orbis/.temp";
+        String tempFolderPath = Environment.getExternalStorageDirectory().toString() + GlobalVars.tempFolderDir;
         File tempFolder = new File(tempFolderPath);
         tempFolder.mkdirs();
-        String leftOutputPath = tempFolderPath + "/latest_capture_left.jpg";
-        String rightOutputPath = tempFolderPath + "/latest_capture_right.jpg";
+        String leftOutputPath = Environment.getExternalStorageDirectory().toString() + GlobalVars.leftCapturePath;
+        String rightOutputPath = Environment.getExternalStorageDirectory().toString() + GlobalVars.rightCapturePath;
         File leftFile = new File(leftOutputPath);
         File rightFile = new File(rightOutputPath);
         Intent stereoCameraIntent = new Intent(this, StereoCameraActivity.class);
@@ -132,11 +132,8 @@ public class ImportActivity extends AppCompatActivity {
                     break; // TODO image capture failed/was cancelled
                 }
                 String orbisPath = Environment.getExternalStorageDirectory().toString() + "/Orbis";
-                String basePath = orbisPath + "/.temp/latest_capture_";
-                String pathLeft = basePath + "left.jpg";
-                String pathRight = basePath + "right.jpg";
-                File left = new  File(pathLeft);
-                File right = new  File(pathRight);
+                File left = new File(Environment.getExternalStorageDirectory().toString() + GlobalVars.leftCapturePath);
+                File right = new File(Environment.getExternalStorageDirectory().toString() + GlobalVars.rightCapturePath);
                 if(left.exists() && right.exists()){
                     Bitmap leftBitmap = BitmapFactory.decodeFile(left.getAbsolutePath());
                     Bitmap rightBitmap = BitmapFactory.decodeFile(right.getAbsolutePath());

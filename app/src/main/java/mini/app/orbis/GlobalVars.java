@@ -37,6 +37,10 @@ public class GlobalVars {
     public static final String SAVE_FILE_FORMAT = "jpg";
     public static final String[] ACCEPTED_FILE_FORMATS = {"jps", "jpeg", "jpg"};
 
+    public static final String tempFolderDir = "/Orbis/.temp";
+    public static final String leftCapturePath = tempFolderDir + "/latest_capture_left.jpg";
+    public static final String rightCapturePath = tempFolderDir + "/latest_capture_right.jpg";
+
 
     public static final String SKU_PREMIUM = "android.test.purchased"; // TODO URGENT
 }

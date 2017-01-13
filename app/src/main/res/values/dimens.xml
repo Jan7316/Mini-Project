@@ -69,6 +69,10 @@
     <!-- Purchase verification and introduction for users who have not bought a headset -->
     <dimen name="vp_info_text_size">20dp</dimen>
 
+    <!-- Camera -->
+    <dimen name="c_buttons_margin_bottom">20dp</dimen>
+
+
 
     <dimen name="single_elevation">2dp</dimen>
 
