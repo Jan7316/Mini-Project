@@ -3,6 +3,7 @@ package mini.app.orbis;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
@@ -27,11 +28,13 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 
 import java.io.FileOutputStream;
@@ -227,6 +230,16 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
         FontManager.applyFontToView(this, (Button) findViewById(R.id.save), FontManager.Font.lato);
         FontManager.applyFontToView(this, (Button) findViewById(R.id.cancel), FontManager.Font.lato);
         markAsSaveable(false);
+
+        SharedPreferences usageStats = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
+        boolean initialised = usageStats.getBoolean(GlobalVars.KEY_CAMERA_INITIALISED, false);
+        if(!initialised) {
+            showInstructions();
+            SharedPreferences sharedPref = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putBoolean(GlobalVars.KEY_CAMERA_INITIALISED, true);
+            editor.apply();
+        }
     }
 
     @Override
@@ -665,5 +678,17 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
         Intent returnIntent = new Intent();
         setResult(RESULT_OK,returnIntent);
         finish();
+    }
+
+    private void showInstructions() {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Tip")
+                .setMessage("To learn how to use the 3D camera, consult '3D Photography' in the Guides section of the app")
+                .setNeutralButton("Continue", null).create();
+        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        dialog.show();
+        dialog.getWindow().getDecorView().setSystemUiVisibility(
+                this.getWindow().getDecorView().getSystemUiVisibility());
+        dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
     }
 }
