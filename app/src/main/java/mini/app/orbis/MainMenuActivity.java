@@ -91,7 +91,7 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
         logo_text.setAnimation(logoTextAnimations);
         menu.setAnimation(fadeInMenu);
 
-        findViewById(R.id.trial_info_bar).setVisibility(View.GONE);
+        findViewById(R.id.trial_info_bar).setVisibility(View.INVISIBLE);
 
         FontManager.applyFontToView(this, (TextView) findViewById(R.id.trial_info_top), FontManager.Font.lato_bold);
         FontManager.applyFontToView(this, (TextView) findViewById(R.id.trial_info_bottom), FontManager.Font.lato);
@@ -142,7 +142,7 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
                         bought = inventory.hasPurchase(GlobalVars.SKU_PREMIUM);
                         if(bought) {
                             active = true;
-                            findViewById(R.id.trial_info_bar).setVisibility(View.GONE);
+                            findViewById(R.id.trial_info_bar).setVisibility(View.INVISIBLE);
                         } else {
                             if(today > firstUsage + trialPeriod) {
                                 active = false;
@@ -268,7 +268,7 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
                     this.getWindow().getDecorView().getSystemUiVisibility());
             dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
         } else if (purchase.getSku().equals(GlobalVars.SKU_PREMIUM)) {
-            findViewById(R.id.trial_info_bar).setVisibility(View.GONE);
+            findViewById(R.id.trial_info_bar).setVisibility(View.INVISIBLE);
             startActivity(new Intent(this, PurchaseSuccessfulActivity.class));
         }
     }
