@@ -401,6 +401,8 @@ public class GalleryActivity extends AppCompatActivity implements GalleryItemFra
         updateFragmentImages();
         hideActionBarIcons();
         updateSpaces();
+
+        selectionMode = false;
     }
 
     public void shareSelectedItems(View view) {

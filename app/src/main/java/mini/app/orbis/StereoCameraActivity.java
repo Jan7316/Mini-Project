@@ -70,6 +70,8 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
 
     private List<Boolean> imagesTaken = new ArrayList<>();
 
+    private boolean processingCapture;
+
     private Surface leftSurface;
     private Surface rightSurface;
     private boolean otherSurfaceInitialized;
@@ -234,7 +236,7 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
         SharedPreferences usageStats = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
         boolean initialised = usageStats.getBoolean(GlobalVars.KEY_CAMERA_INITIALISED, false);
         if(!initialised) {
-            showInstructions();
+            showInstructions(); // TODO this could be the cause for the SurfaceViews being too small when opening the camera for the first time
             SharedPreferences sharedPref = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.putBoolean(GlobalVars.KEY_CAMERA_INITIALISED, true);
@@ -524,11 +526,18 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
                             @Override
                             public void run() {
                                 markAsSaveable(true);
+                                setProcessingCapture(false);
                             }
                         });
                     } else {
                         firstResult = result;
                         unlockFocus();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setProcessingCapture(false);
+                            }
+                        });
                     }
                 }
             };
@@ -601,17 +610,22 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
     }
 
     @Override
-    public void onClick(View v) {
+    public synchronized void onClick(View v) {
+        if(processingCapture) {
+            return;
+        }
         switch (v.getId()) {
             case R.id.leftView:
                 if (!imagesTaken.contains(LEFT_IMAGE)) {
                     imagesTaken.add(LEFT_IMAGE);
+                    processingCapture = true;
                     takePicture();
                 }
                 break;
             case R.id.rightView:
                 if (!imagesTaken.contains(RIGHT_IMAGE)) {
                     imagesTaken.add(RIGHT_IMAGE);
+                    processingCapture = true;
                     takePicture();
                 }
                 break;
@@ -690,5 +704,9 @@ public class StereoCameraActivity extends AppCompatActivity implements TextureVi
         dialog.getWindow().getDecorView().setSystemUiVisibility(
                 this.getWindow().getDecorView().getSystemUiVisibility());
         dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+    }
+
+    private void setProcessingCapture(boolean b) {
+        processingCapture = b;
     }
 }
