@@ -18,6 +18,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
+import android.widget.TextView;
 
 import java.util.Date;
 
@@ -31,6 +32,7 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
     IabHelper mHelper;
 
     boolean active; // true if the app is allowed to be used
+    boolean bought;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +91,11 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
         logo_text.setAnimation(logoTextAnimations);
         menu.setAnimation(fadeInMenu);
 
+        findViewById(R.id.trial_info_bar).setVisibility(View.GONE);
+
+        FontManager.applyFontToView(this, (TextView) findViewById(R.id.trial_info_top), FontManager.Font.lato_bold);
+        FontManager.applyFontToView(this, (TextView) findViewById(R.id.trial_info_bottom), FontManager.Font.lato);
+
         initializeIAB();
 
         SharedPreferences usageStats = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
@@ -120,35 +127,66 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
 
     private void checkPurchaseStatus() {
         SharedPreferences usageStats = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
-        long firstUsage = usageStats.getLong(GlobalVars.KEY_FIRST_USAGE, new Date().getTime());
-        long today = new Date().getTime();
-        long trialPeriod = 1000 * 60 * 60 * 24 * 7;
+        final long firstUsage = usageStats.getLong(GlobalVars.KEY_FIRST_USAGE, new Date().getTime());
+        final long today = new Date().getTime();
+        final long trialPeriod = 1000 * 60 * 60 * 24 * 7;
         if(GlobalVars.isDebug) {
             active = true;
             return;
         }
-        if(today > firstUsage + trialPeriod) {
-            active = false;
-            try {
-                mHelper.queryInventoryAsync(new IabHelper.QueryInventoryFinishedListener() {
-                    public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
-                        if (result.isFailure()) {
-                        }
-                        else {
-                            active = inventory.hasPurchase(GlobalVars.SKU_PREMIUM);
+
+        try {
+            mHelper.queryInventoryAsync(new IabHelper.QueryInventoryFinishedListener() {
+                public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+                    if (result.isSuccess()) {
+                        bought = inventory.hasPurchase(GlobalVars.SKU_PREMIUM);
+                        if(bought) {
+                            active = true;
+                            findViewById(R.id.trial_info_bar).setVisibility(View.GONE);
+                        } else {
+                            if(today > firstUsage + trialPeriod) {
+                                active = false;
+                                showTrialInfoBar(0);
+                            } else {
+                                active = true;
+                                long day = 1000 * 60 * 60 * 24;
+                                int daysPassed = (int) ((today - firstUsage) / day);
+                                showTrialInfoBar(7 - daysPassed);
+                            }
                         }
                     }
-                });
-            } catch(IabHelper.IabAsyncInProgressException e) {
-                Log.d("Orbis", "IAB query failed");
-                e.printStackTrace();
-            }
+                }
+            });
+        } catch(IabHelper.IabAsyncInProgressException e) {
+            Log.d("Orbis", "IAB query failed");
+            e.printStackTrace();
+        }
+
+        SharedPreferences sharedPref = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putLong(GlobalVars.KEY_FIRST_USAGE, firstUsage);
+        editor.apply();
+    }
+
+    /**
+     * @param status number of trial left, in days. 0 = trial elapsed
+     */
+    private void showTrialInfoBar(int status) {
+        if(status == 0) {
+            ((TextView) findViewById(R.id.trial_info_bottom)).setText("Elapsed");
+        } else if(status == 1) {
+            ((TextView) findViewById(R.id.trial_info_bottom)).setText("1 day remaining");
         } else {
-            active = true;
-            SharedPreferences sharedPref = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putLong(GlobalVars.KEY_FIRST_USAGE, firstUsage);
-            editor.apply();
+            ((TextView) findViewById(R.id.trial_info_bottom)).setText(status + " days remaining");
+        }
+        findViewById(R.id.trial_info_bar).setVisibility(View.VISIBLE);
+    }
+
+    public void buyUpgrade(View view) {
+        try {
+            mHelper.launchPurchaseFlow(this, GlobalVars.SKU_PREMIUM, 10001, this, "PURCHASE VERIFIER - TODO");
+        } catch(IabHelper.IabAsyncInProgressException e) {
+            e.printStackTrace();
         }
     }
 
@@ -220,8 +258,8 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
     public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
         if (result.isFailure()) {
             AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setTitle("An Error Occurred")
-                    .setMessage("An error has occurred while processing your purchase. Please try again. If this error persists, please reinstall the app or contact the Orbis team.")
+                    .setTitle("Purchase Cancelled")
+                    .setMessage("It looks like the purchase was cancelled. If this is an error, please try reinstalling the app or contact the Orbis team.")
                     .setIcon(R.drawable.ic_error)
                     .setNeutralButton("Dismiss", null).create();
             dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
@@ -230,6 +268,7 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
                     this.getWindow().getDecorView().getSystemUiVisibility());
             dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
         } else if (purchase.getSku().equals(GlobalVars.SKU_PREMIUM)) {
+            findViewById(R.id.trial_info_bar).setVisibility(View.GONE);
             startActivity(new Intent(this, PurchaseSuccessfulActivity.class));
         }
     }

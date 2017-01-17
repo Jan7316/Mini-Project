@@ -11,7 +11,7 @@ import android.widget.TextView;
 public class FontManager {
 
     private static boolean initialised;
-    private static Typeface lato, lato_light;
+    private static Typeface lato, lato_light, lato_bold;
 
     public static synchronized void applyFontToView(Context context, TextView view, Font font) {
         if(!initialised) {
@@ -24,18 +24,23 @@ public class FontManager {
             case lato_light:
                 view.setTypeface(lato_light);
                 break;
+            case lato_bold:
+                view.setTypeface(lato_bold);
+                break;
         }
     }
 
     private static void initialise(Context context) {
         lato = Typeface.createFromAsset(context.getAssets(), "fonts/Lato-Regular.ttf");
         lato_light = Typeface.createFromAsset(context.getAssets(), "fonts/Lato-Hairline.ttf");
+        lato_bold = Typeface.createFromAsset(context.getAssets(), "fonts/Lato-Bold.ttf");
         initialised = true;
     }
 
     public enum Font {
         lato,
-        lato_light
+        lato_light,
+        lato_bold
     }
 
 }
