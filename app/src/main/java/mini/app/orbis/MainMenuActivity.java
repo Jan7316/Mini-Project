@@ -48,6 +48,9 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
         int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
 
+        FontManager.applyFontToView(this, (TextView) findViewById(R.id.trial_info_top), FontManager.Font.lato_bold);
+        FontManager.applyFontToView(this, (TextView) findViewById(R.id.trial_info_bottom), FontManager.Font.lato);
+
         if(savedInstanceState != null) {
             logo_text.setVisibility(View.GONE);
 
@@ -92,9 +95,6 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
         menu.setAnimation(fadeInMenu);
 
         findViewById(R.id.trial_info_bar).setVisibility(View.INVISIBLE);
-
-        FontManager.applyFontToView(this, (TextView) findViewById(R.id.trial_info_top), FontManager.Font.lato_bold);
-        FontManager.applyFontToView(this, (TextView) findViewById(R.id.trial_info_bottom), FontManager.Font.lato);
 
         initializeIAB();
 
