@@ -166,6 +166,8 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putLong(GlobalVars.KEY_FIRST_USAGE, firstUsage);
         editor.apply();
+
+        VersionManager.run(getApplicationContext());
     }
 
     /**
