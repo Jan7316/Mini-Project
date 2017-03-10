@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -135,9 +137,7 @@ public class ImportActivity extends AppCompatActivity {
                 File left = new File(Environment.getExternalStorageDirectory().toString() + GlobalVars.leftCapturePath);
                 File right = new File(Environment.getExternalStorageDirectory().toString() + GlobalVars.rightCapturePath);
                 if(left.exists() && right.exists()){
-                    Bitmap leftBitmap = BitmapFactory.decodeFile(left.getAbsolutePath());
-                    Bitmap rightBitmap = BitmapFactory.decodeFile(right.getAbsolutePath());
-                    Bitmap combined = combineImages(leftBitmap, rightBitmap);
+                    Bitmap combined = combineImages(left.getAbsolutePath(), right.getAbsolutePath());
 
                     int imageNum = 0; // TODO: Save current image number instead of loopig through all possibilities every time
                     File file = new File(orbisPath + "/OrbisImage_"+imageNum+".jps");
@@ -233,15 +233,25 @@ public class ImportActivity extends AppCompatActivity {
     }
 
     // This is untested code from stackoverflow
-    public Bitmap combineImages(Bitmap c, Bitmap s) {
+    public Bitmap combineImages(String cPath, String sPath) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        Bitmap s = BitmapFactory.decodeFile(cPath, options);
+        int imageWidth = s.getWidth();
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int scaleValue = Math.round(imageWidth/(size.x/2));
 
-        int width = 1000; // TODO this is a random value
+        options.inJustDecodeBounds = false;
+        options.inSampleSize = scaleValue;
+        Bitmap c = BitmapFactory.decodeFile(cPath, options);
+        s = BitmapFactory.decodeFile(sPath, options);
+
+        int width = size.x;
         int height = (int) ((((float)c.getHeight()) / c.getWidth()) * width);
 
-        c = Bitmap.createScaledBitmap(c, width, height, false);
-        s = Bitmap.createScaledBitmap(s, width, height, false);
-
-        Bitmap cs = Bitmap.createBitmap(width * 2, height, Bitmap.Config.ARGB_4444);
+        Bitmap cs = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
 
         Canvas comboImage = new Canvas(cs);
 
