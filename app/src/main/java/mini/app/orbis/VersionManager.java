@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
-import java.io.File;
-
 /**
  * Created by Jan on 21/01/2017.
  */
