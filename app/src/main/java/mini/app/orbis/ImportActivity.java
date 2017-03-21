@@ -232,7 +232,6 @@ public class ImportActivity extends AppCompatActivity {
         }
     }
 
-    // This is untested code from stackoverflow
     public Bitmap combineImages(String cPath, String sPath) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
