@@ -10,8 +10,8 @@ import android.support.annotation.NonNull;
 
 public class VersionManager {
 
-    public static String versionName = "1.0.1";
-    public static int versionCode = 7;
+    public static String versionName = "1.0.2";
+    public static int versionCode = 8;
 
 
     public static int[] previouslyInstalledVersions;
@@ -68,7 +68,7 @@ public class VersionManager {
      * Only to be called after init is done
      */
     private static int getLastInstalledVersion(Context context) {
-        if(initialized)
+        if(initialized && previouslyInstalledVersions.length > 0)
             return previouslyInstalledVersions[previouslyInstalledVersions.length - 1];
         return -1;
     }

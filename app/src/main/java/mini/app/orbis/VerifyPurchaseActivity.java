@@ -105,7 +105,7 @@ public class VerifyPurchaseActivity extends AppCompatActivity implements IabHelp
     }
 
     @Override
-    public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
+    public synchronized void onIabPurchaseFinished(IabResult result, Purchase purchase) {
         if (result.isFailure()) {
             AlertDialog dialog = new AlertDialog.Builder(this)
                     .setTitle("An Error Occurred")
@@ -123,7 +123,7 @@ public class VerifyPurchaseActivity extends AppCompatActivity implements IabHelp
         }
     }
 
-    private void markAppAsInitialised() {
+    private synchronized void markAppAsInitialised() {
         SharedPreferences sharedPref = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putBoolean(GlobalVars.KEY_INITIALISED, true);
