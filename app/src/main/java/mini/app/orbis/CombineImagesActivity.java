@@ -230,8 +230,8 @@ public class CombineImagesActivity extends AppCompatActivity {
     private Bitmap combineImages(String cPath, String sPath) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        Bitmap s = BitmapFactory.decodeFile(cPath, options);
-        int imageWidth = s.getWidth();
+        BitmapFactory.decodeFile(cPath, options);
+        int imageWidth = options.outWidth;
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -240,7 +240,7 @@ public class CombineImagesActivity extends AppCompatActivity {
         options.inJustDecodeBounds = false;
         options.inSampleSize = scaleValue;
         Bitmap c = BitmapFactory.decodeFile(cPath, options);
-        s = BitmapFactory.decodeFile(sPath, options);
+        Bitmap s = BitmapFactory.decodeFile(sPath, options);
 
         int width = size.x;
         int height = (int) ((((float)c.getHeight()) / c.getWidth()) * width);
