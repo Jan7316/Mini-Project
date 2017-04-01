@@ -97,12 +97,6 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
         findViewById(R.id.trial_info_bar).setVisibility(View.INVISIBLE);
 
         initializeIAB();
-
-        SharedPreferences usageStats = getSharedPreferences(GlobalVars.USAGE_STATS_PREFERENCE_FILE, Context.MODE_PRIVATE);
-        boolean initialised = usageStats.getBoolean(GlobalVars.KEY_INITIALISED, false);
-        if(!initialised) {
-            startActivity(new Intent(this, InitialWelcomeActivity.class));
-        }
     }
 
     private void initializeIAB() {

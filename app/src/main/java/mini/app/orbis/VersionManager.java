@@ -10,8 +10,8 @@ import android.support.annotation.NonNull;
 
 public class VersionManager {
 
-    public static String versionName = "1.0.2";
-    public static int versionCode = 8;
+    public static String versionName = "1.0.4";
+    public static int versionCode = 9;
 
 
     public static int[] previouslyInstalledVersions;
