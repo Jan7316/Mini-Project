@@ -138,4 +138,11 @@
         </RelativeLayout>
 
     </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/menu_version_label_text_size"
+        android:layout_margin="@dimen/menu_version_label_margin"
+        android:id="@+id/version_label"/>
 </RelativeLayout>

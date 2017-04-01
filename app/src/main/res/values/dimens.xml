@@ -17,6 +17,9 @@
     <dimen name="menu_icon_distance">30dp</dimen>
     <dimen name="menu_text_height">120dp</dimen>
 
+    <dimen name="menu_version_label_text_size">12dp</dimen>
+    <dimen name="menu_version_label_margin">10dp</dimen>
+
     <!-- Gallery -->
     <dimen name="gallery_item_width">200dp</dimen>
     <dimen name="gallery_item_height">180dp</dimen>

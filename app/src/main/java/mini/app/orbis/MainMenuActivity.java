@@ -37,7 +37,7 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_menu); //TODO temp
+        setContentView(R.layout.activity_main_menu);
 
         View logo = findViewById(R.id.logo);
         final View logo_text = findViewById(R.id.logo_text);
@@ -50,6 +50,9 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
 
         FontManager.applyFontToView(this, (TextView) findViewById(R.id.trial_info_top), FontManager.Font.lato_bold);
         FontManager.applyFontToView(this, (TextView) findViewById(R.id.trial_info_bottom), FontManager.Font.lato);
+        FontManager.applyFontToView(this, (TextView) findViewById(R.id.version_label), FontManager.Font.lato);
+
+        ((TextView) findViewById(R.id.version_label)).setText("v" + VersionManager.versionName);
 
         if(savedInstanceState != null) {
             logo_text.setVisibility(View.GONE);
@@ -64,7 +67,7 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
 
         Animation fadeInMenu = new AlphaAnimation(0, 1);
         fadeInMenu.setDuration(1000);
-        fadeInMenu.setStartOffset(4000); // TODO
+        fadeInMenu.setStartOffset(4000);
 
         Animation fadeOut = new AlphaAnimation(1, 0);
         fadeOut.setDuration(1000);
@@ -93,6 +96,8 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
         logo.setAnimation(fadeIn);
         logo_text.setAnimation(logoTextAnimations);
         menu.setAnimation(fadeInMenu);
+
+        findViewById(R.id.version_label).setAnimation(fadeInMenu);
 
         findViewById(R.id.trial_info_bar).setVisibility(View.INVISIBLE);
 
@@ -252,18 +257,7 @@ public class MainMenuActivity extends AppCompatActivity implements IabHelper.OnI
 
     @Override
     public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
-        if (result.isFailure()) {
-            AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setTitle("Purchase Cancelled")
-                    .setMessage("It looks like the purchase was cancelled. If this is an error, please try reinstalling the app or contact the Orbis team.")
-                    .setIcon(R.drawable.ic_error)
-                    .setNeutralButton("Dismiss", null).create();
-            dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-            dialog.show();
-            dialog.getWindow().getDecorView().setSystemUiVisibility(
-                    this.getWindow().getDecorView().getSystemUiVisibility());
-            dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-        } else if (purchase.getSku().equals(GlobalVars.SKU_PREMIUM)) {
+        if (result.isSuccess() && purchase.getSku().equals(GlobalVars.SKU_PREMIUM)) {
             findViewById(R.id.trial_info_bar).setVisibility(View.INVISIBLE);
             startActivity(new Intent(this, PurchaseSuccessfulActivity.class));
         }
